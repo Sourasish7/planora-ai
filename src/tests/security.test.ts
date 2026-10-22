@@ -1,0 +1,67 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
+  sanitizeInput,
+  sanitizeObject,
+  checkRateLimit,
+  EventPlanInputSchema,
+} from "@/lib/security";
+
+test("Security: sanitizeInput strips harmful script and HTML tags", () => {
+  const malicious1 = '<script>alert("XSS")</script>Hello World';
+  assert.equal(sanitizeInput(malicious1), "Hello World");
+
+  const malicious2 = '<img src=x onerror="alert(1)">Party Time';
+  assert.equal(sanitizeInput(malicious2), "Party Time");
+
+  const malicious3 = "javascript:evil()";
+  assert.equal(sanitizeInput(malicious3), "evil()");
+});
+
+test("Security: sanitizeObject recursively strips strings and arrays", () => {
+  const input = {
+    title: "<b>Grand Wedding</b>",
+    budget: 5000,
+    nested: {
+      notes: "<script>hack()</script>Special Notes",
+    },
+    list: ["<i>Item 1</i>", "Item 2"],
+  };
+
+  const clean = sanitizeObject(input);
+  assert.equal(clean.title, "Grand Wedding");
+  assert.equal(clean.nested.notes, "Special Notes");
+  assert.equal(clean.list[0], "Item 1");
+  assert.equal(clean.budget, 5000);
+});
+
+test("Security: checkRateLimit restricts excessive requests", () => {
+  const testIp = `test-ip-${Date.now()}`;
+  for (let i = 0; i < 5; i++) {
+    const res = checkRateLimit(testIp, 5, 10000);
+    assert.equal(res.allowed, true);
+  }
+  const blocked = checkRateLimit(testIp, 5, 10000);
+  assert.equal(blocked.allowed, false);
+});
+
+test("Security: EventPlanInputSchema enforces valid data boundaries", () => {
+  const valid = {
+    title: "Birthday Bash",
+    eventType: "birthday",
+    guestCount: 50,
+    budget: 3000,
+    currency: "USD",
+  };
+  const parsed = EventPlanInputSchema.safeParse(valid);
+  assert.equal(parsed.success, true);
+
+  const invalid = {
+    title: "A", // too short (< 2)
+    eventType: "invalid_type",
+    guestCount: -5,
+    budget: -100,
+  };
+  const failed = EventPlanInputSchema.safeParse(invalid);
+  assert.equal(failed.success, false);
+});

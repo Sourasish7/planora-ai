@@ -1,0 +1,329 @@
+{
+  "events": [],
+  "userSettings": {
+    "preferredCurrency": "INR",
+    "aiProvider": "auto",
+    "theme": "dark",
+    "apiKey": ""
+  },
+  "auditLogs": [
+    {
+      "id": "log-1792657274835",
+      "timestamp": "2026-10-22T08:21:14.835Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792652511195-04w1s"
+    },
+    {
+      "id": "log-1792657268015",
+      "timestamp": "2026-10-22T08:21:08.015Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792657268012-kbh66"
+    },
+    {
+      "id": "log-1792657268014",
+      "timestamp": "2026-10-22T08:21:08.014Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792657268013",
+      "timestamp": "2026-10-22T08:21:08.012Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792656749017",
+      "timestamp": "2026-10-22T08:12:29.017Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792656749014-3ftoh"
+    },
+    {
+      "id": "log-1792656749016",
+      "timestamp": "2026-10-22T08:12:29.016Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792656749014",
+      "timestamp": "2026-10-22T08:12:29.013Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792656496019",
+      "timestamp": "2026-10-22T08:08:16.019Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792656496015-8pftg"
+    },
+    {
+      "id": "log-1792656496017",
+      "timestamp": "2026-10-22T08:08:16.017Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792656496015",
+      "timestamp": "2026-10-22T08:08:16.015Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792656316650",
+      "timestamp": "2026-10-22T08:05:16.650Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656315572",
+      "timestamp": "2026-10-22T08:05:15.572Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656314723",
+      "timestamp": "2026-10-22T08:05:14.723Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656313812",
+      "timestamp": "2026-10-22T08:05:13.812Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656312883",
+      "timestamp": "2026-10-22T08:05:12.883Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656312079",
+      "timestamp": "2026-10-22T08:05:12.079Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656310501",
+      "timestamp": "2026-10-22T08:05:10.501Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792656017136",
+      "timestamp": "2026-10-22T08:00:17.136Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792656017133-2mk2a"
+    },
+    {
+      "id": "log-1792656017135",
+      "timestamp": "2026-10-22T08:00:17.135Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792656017134",
+      "timestamp": "2026-10-22T08:00:17.133Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792655811501",
+      "timestamp": "2026-10-22T07:56:51.501Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792655811498-2gxz0"
+    },
+    {
+      "id": "log-1792655811500",
+      "timestamp": "2026-10-22T07:56:51.500Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792655811498",
+      "timestamp": "2026-10-22T07:56:51.497Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792655350859",
+      "timestamp": "2026-10-22T07:49:10.859Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792655350856-dl94d"
+    },
+    {
+      "id": "log-1792655350858",
+      "timestamp": "2026-10-22T07:49:10.858Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792655350857",
+      "timestamp": "2026-10-22T07:49:10.856Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792654760477",
+      "timestamp": "2026-10-22T07:39:20.477Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792654760472-040cz"
+    },
+    {
+      "id": "log-1792654760476",
+      "timestamp": "2026-10-22T07:39:20.476Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792654760473",
+      "timestamp": "2026-10-22T07:39:20.471Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792654443102",
+      "timestamp": "2026-10-22T07:34:03.102Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654443065",
+      "timestamp": "2026-10-22T07:34:03.065Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654322225",
+      "timestamp": "2026-10-22T07:32:02.225Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654319515",
+      "timestamp": "2026-10-22T07:31:59.515Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654319034",
+      "timestamp": "2026-10-22T07:31:59.034Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654318050",
+      "timestamp": "2026-10-22T07:31:58.050Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654317177",
+      "timestamp": "2026-10-22T07:31:57.177Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792654317144",
+      "timestamp": "2026-10-22T07:31:57.144Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653973980",
+      "timestamp": "2026-10-22T07:26:13.980Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653973978",
+      "timestamp": "2026-10-22T07:26:13.978Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653971582",
+      "timestamp": "2026-10-22T07:26:11.582Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653971580",
+      "timestamp": "2026-10-22T07:26:11.580Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653969472",
+      "timestamp": "2026-10-22T07:26:09.472Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653969470",
+      "timestamp": "2026-10-22T07:26:09.470Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653966932",
+      "timestamp": "2026-10-22T07:26:06.932Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653966931",
+      "timestamp": "2026-10-22T07:26:06.931Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792653819428",
+      "timestamp": "2026-10-22T07:23:39.428Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792653819425-34zgo"
+    },
+    {
+      "id": "log-1792653819427",
+      "timestamp": "2026-10-22T07:23:39.427Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792653819425",
+      "timestamp": "2026-10-22T07:23:39.424Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792652613566",
+      "timestamp": "2026-10-22T07:03:33.566Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792652613561-8rapu"
+    },
+    {
+      "id": "log-1792652613563",
+      "timestamp": "2026-10-22T07:03:33.563Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792652613561",
+      "timestamp": "2026-10-22T07:03:33.559Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792652511196",
+      "timestamp": "2026-10-22T07:01:51.195Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday' (birthday)"
+    },
+    {
+      "id": "log-init",
+      "timestamp": "2026-10-22T08:00:00Z",
+      "action": "INITIALIZE_DATABASE",
+      "details": "Planora AI Database initialized with clean slate"
+    }
+  ]
+}

@@ -1,0 +1,270 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #faf8f2;
+  --foreground: #000000;
+  --card-bg: #ffffff;
+  --neo-yellow: #eefc27;
+  --neo-peach: #fcd2c2;
+  --neo-blue: #c2e9fb;
+  --neo-mint: #c7f7d4;
+  --neo-border: #000000;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Accessible focus ring */
+*:focus-visible {
+  outline: 3px solid #000000 !important;
+  outline-offset: 2px !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1ede1;
+}
+::-webkit-scrollbar-thumb {
+  background: #000000;
+  border-radius: 9999px;
+  border: 2px solid #faf8f2;
+}
+
+/* =========================================================
+   NEOBRUTALISM / RETRO POP FLAT ILLUSTRATION UI SYSTEM
+   ========================================================= */
+
+/* Neo Card Base */
+.neo-card {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.neo-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+/* Pastel Neo Cards */
+.neo-card-yellow {
+  background-color: #eefc27;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-card-peach {
+  background-color: #fcd2c2;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-card-blue {
+  background-color: #c2e9fb;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.neo-card-mint {
+  background-color: #c7f7d4;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+/* Neo Action Buttons */
+.neo-btn {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0.875rem;
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neo-btn:hover {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1.5px 1.5px 0px 0px #000000;
+}
+
+.neo-btn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+.neo-btn-primary {
+  background-color: #eefc27;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0.875rem;
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neo-btn-primary:hover {
+  background-color: #e5f617;
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1.5px 1.5px 0px 0px #000000;
+}
+
+.neo-btn-primary:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+/* Neo Pills and Badges */
+.neo-pill {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1.5px solid #000000;
+  border-radius: 9999px;
+  font-weight: 600;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+/* Backward compatibility mapping */
+.liquid-glass,
+.glass-panel {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 1.25rem;
+  box-shadow: 4px 4px 0px 0px #000000;
+}
+
+.liquid-glass-interactive,
+.glass-panel-hover {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.liquid-glass-interactive:hover,
+.glass-panel-hover:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0px 0px #000000;
+}
+
+.liquid-pill {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1.5px solid #000000;
+  border-radius: 9999px;
+  box-shadow: 2px 2px 0px 0px #000000;
+}
+
+.liquid-button {
+  background-color: #eefc27;
+  color: #000000;
+  border: 2px solid #000000;
+  border-radius: 0.875rem;
+  font-weight: 700;
+  box-shadow: 3px 3px 0px 0px #000000;
+  transition: all 0.15s ease;
+}
+
+.liquid-button:hover {
+  background-color: #e5f617;
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1.5px 1.5px 0px 0px #000000;
+}
+
+.liquid-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px 0px #000000;
+}
+
+/* Print Styles for Simple Expense Report */
+@media print {
+  /* Reset html, body and root wrappers to eliminate empty first page */
+  html,
+  body,
+  .min-h-screen {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Hide the web screen app UI, navbar, main content, and portals */
+  header,
+  nav,
+  footer,
+  aside,
+  #main-content,
+  .no-print,
+  .expense-modal-backdrop,
+  [aria-hidden="true"] {
+    display: none !important;
+  }
+
+  /* Display the print report clearly starting on page 1 */
+  .print-report-container,
+  #printable-expense-report {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    visibility: visible !important;
+  }
+
+  #printable-expense-report * {
+    color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  #printable-expense-report th {
+    background-color: #f1ede1 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+  }
+
+  table {
+    page-break-inside: auto;
+    width: 100% !important;
+  }
+
+  tr, .print-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
