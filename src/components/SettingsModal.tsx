@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   Settings,
   X,
-  ShieldCheck,
   Key,
   Check,
   DollarSign,
@@ -107,20 +106,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         <form onSubmit={handleSave} className="mt-4 space-y-4 text-xs font-bold text-black">
-          {/* Security & Architecture Badge */}
-          <div className="rounded-xl border-2 border-black bg-[#c7f7d4] p-3.5 shadow-[2px_2px_0px_0px_#000]">
-            <div className="flex items-center gap-2 text-black font-black mb-1">
-              <ShieldCheck className="h-4 w-4 text-black" />
-              <span>Strict Security & Local JSON Storage</span>
-            </div>
-            <p className="text-[11px] text-slate-800 leading-relaxed font-semibold">
-              • Database: Stored locally in atomic JSON format (`data/planora-db.json`)<br />
-              • Protection: Strict Zod validation schemas & XSS tag sanitization<br />
-              • Rate Limiting: Token-bucket limiter protecting all endpoints<br />
-              • Autonomous Capability: Built-in engine works 100% without external keys.
-            </p>
-          </div>
-
           {/* AI Engine Provider */}
           <div>
             <label className="text-black font-black block">

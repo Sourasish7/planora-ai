@@ -473,6 +473,42 @@
   },
   "auditLogs": [
     {
+      "id": "log-1792726171983",
+      "timestamp": "2026-10-23T03:29:31.983Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792726171978-l1rks"
+    },
+    {
+      "id": "log-1792726171981",
+      "timestamp": "2026-10-23T03:29:31.981Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792726171979",
+      "timestamp": "2026-10-23T03:29:31.977Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792725884846",
+      "timestamp": "2026-10-23T03:24:44.846Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792725884843-1bf6i"
+    },
+    {
+      "id": "log-1792725884845",
+      "timestamp": "2026-10-23T03:24:44.845Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792725884843",
+      "timestamp": "2026-10-23T03:24:44.842Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
       "id": "log-1792725165936",
       "timestamp": "2026-10-23T03:12:45.936Z",
       "action": "UPDATE_EVENT",
