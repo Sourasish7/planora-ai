@@ -64,4 +64,32 @@ test("Security: EventPlanInputSchema enforces valid data boundaries", () => {
   };
   const failed = EventPlanInputSchema.safeParse(invalid);
   assert.equal(failed.success, false);
+
+  // Valid with optional fields like specialRequests, stylePreferences, and currency
+  const detailedValid = {
+    title: "Eco-Friendly Community Fair",
+    eventType: "community_event",
+    guestCount: 200,
+    budget: 15000,
+    currency: "EUR",
+    location: "City Park Amphitheater",
+    stylePreferences: "Rustic & Biodegradable",
+    specialRequests: "Outdoor event with solar lighting and vegan catering",
+  };
+  const detailedParsed = EventPlanInputSchema.safeParse(detailedValid);
+  assert.equal(detailedParsed.success, true);
+  if (detailedParsed.success) {
+    assert.equal(detailedParsed.data.currency, "EUR");
+    assert.equal(detailedParsed.data.guestCount, 200);
+    assert.ok(detailedParsed.data.specialRequests?.includes("solar lighting"));
+  }
 });
+
+test("Security: sanitizeObject safely handles null, undefined, and primitive types", () => {
+  assert.equal(sanitizeObject(null), null);
+  assert.equal(sanitizeObject(undefined), undefined);
+  assert.equal(sanitizeObject(42), 42);
+  assert.equal(sanitizeObject(true), true);
+  assert.equal(sanitizeObject("  <script>evil()</script>Clean Text  "), "Clean Text");
+});
+

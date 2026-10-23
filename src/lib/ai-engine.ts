@@ -746,10 +746,95 @@ IMPORTANT RULES:
       .replace(/```\s*/gi, "")
       .trim();
 
-    const aiPlan = JSON.parse(cleanedJson);
+    interface RawAiBudgetItem {
+      category?: string;
+      allocatedAmount?: number;
+      notes?: string;
+    }
+
+    interface RawAiMilestone {
+      timeframe?: string;
+      title?: string;
+      description?: string;
+    }
+
+    interface RawAiRunOfShowItem {
+      time?: string;
+      activity?: string;
+      personInCharge?: string;
+      location?: string;
+    }
+
+    interface RawAiVendor {
+      name?: string;
+      category?: string;
+      status?: Vendor["status"];
+      quotedPrice?: number;
+      notes?: string;
+    }
+
+    interface RawAiTheme {
+      name?: string;
+      description?: string;
+      colorPalette?: string[];
+      vibes?: string;
+      decorations?: string[];
+    }
+
+    interface RawAiActivity {
+      title?: string;
+      targetGroup?: string;
+      description?: string;
+      duration?: string;
+    }
+
+    interface RawAiMenu {
+      title?: string;
+      items?: string[];
+      dietaryHighlights?: string[];
+    }
+
+    interface RawAiInvitation {
+      style?: string;
+      headline?: string;
+      body?: string;
+      rsvpDeadlineText?: string;
+    }
+
+    interface RawAiPlaylist {
+      vibe?: string;
+      recommendedGenres?: string[];
+      songHighlights?: string[];
+    }
+
+    interface RawAiSpeech {
+      title?: string;
+      role?: string;
+      speechText?: string;
+      deliveryTips?: string;
+    }
+
+    interface RawAiPlanResponse {
+      welcomeMessage?: string;
+      theme?: string;
+      budgetAllocations?: RawAiBudgetItem[];
+      milestones?: RawAiMilestone[];
+      runOfShow?: RawAiRunOfShowItem[];
+      vendors?: RawAiVendor[];
+      ideas?: {
+        themes?: RawAiTheme[];
+        activities?: RawAiActivity[];
+        menus?: RawAiMenu[];
+        invitationTemplates?: RawAiInvitation[];
+        musicPlaylists?: RawAiPlaylist[];
+        speeches?: RawAiSpeech[];
+      };
+    }
+
+    const aiPlan: RawAiPlanResponse = JSON.parse(cleanedJson);
 
     // Build the full event plan from AI response, with safe defaults
-    const budgetAllocations: BudgetItem[] = (aiPlan.budgetAllocations || []).map((item: any, idx: number) => ({
+    const budgetAllocations: BudgetItem[] = (aiPlan.budgetAllocations || []).map((item: RawAiBudgetItem, idx: number) => ({
       id: `b-${idx + 1}`,
       category: item.category || `Category ${idx + 1}`,
       allocatedAmount: Math.round(item.allocatedAmount || 0),
@@ -757,7 +842,7 @@ IMPORTANT RULES:
       notes: item.notes || "",
     }));
 
-    const milestones: Milestone[] = (aiPlan.milestones || []).map((item: any, idx: number) => ({
+    const milestones: Milestone[] = (aiPlan.milestones || []).map((item: RawAiMilestone, idx: number) => ({
       id: `m-${idx + 1}`,
       timeframe: item.timeframe || `Step ${idx + 1}`,
       title: item.title || `Milestone ${idx + 1}`,
@@ -765,7 +850,7 @@ IMPORTANT RULES:
       completed: idx === 0,
     }));
 
-    const runOfShow: RunOfShowItem[] = (aiPlan.runOfShow || []).map((item: any, idx: number) => ({
+    const runOfShow: RunOfShowItem[] = (aiPlan.runOfShow || []).map((item: RawAiRunOfShowItem, idx: number) => ({
       id: `ros-${idx + 1}`,
       time: item.time || `${6 + idx}:00 PM`,
       activity: item.activity || `Activity ${idx + 1}`,
@@ -774,7 +859,7 @@ IMPORTANT RULES:
       status: "upcoming" as const,
     }));
 
-    const vendors: Vendor[] = (aiPlan.vendors || []).map((item: any, idx: number) => ({
+    const vendors: Vendor[] = (aiPlan.vendors || []).map((item: RawAiVendor, idx: number) => ({
       id: `v-${idx + 1}`,
       name: item.name || `Vendor ${idx + 1}`,
       category: item.category || "General",
@@ -786,7 +871,7 @@ IMPORTANT RULES:
     }));
 
     const fallbackIdeas = getIdeasForType(input.eventType || "custom", input);
-    const parsedThemes = (aiPlan.ideas?.themes || []).map((t: any) => ({
+    const parsedThemes = (aiPlan.ideas?.themes || []).map((t: RawAiTheme) => ({
       name: t.name || fallbackIdeas.themes[0]?.name || "Custom Theme",
       description: t.description || fallbackIdeas.themes[0]?.description || "",
       colorPalette: t.colorPalette || fallbackIdeas.themes[0]?.colorPalette || ["#FF007F", "#00F0FF", "#7B2CBF", "#FFE600"],
@@ -798,30 +883,30 @@ IMPORTANT RULES:
 
     const ideas: EventIdeas = {
       themes: parsedThemes.length > 0 ? parsedThemes : fallbackIdeas.themes,
-      activities: (aiPlan.ideas?.activities || []).map((a: any) => ({
+      activities: (aiPlan.ideas?.activities || []).map((a: RawAiActivity) => ({
         title: a.title || "Activity",
         targetGroup: a.targetGroup || "All guests",
         description: a.description || "",
         duration: a.duration || "30 minutes",
       })),
-      menus: (aiPlan.ideas?.menus || []).map((m: any) => ({
+      menus: (aiPlan.ideas?.menus || []).map((m: RawAiMenu) => ({
         title: m.title || "Menu",
         items: m.items || [],
         dietaryHighlights: m.dietaryHighlights || [],
       })),
-      invitationTemplates: (aiPlan.ideas?.invitationTemplates || []).map((inv: any) => ({
+      invitationTemplates: (aiPlan.ideas?.invitationTemplates || []).map((inv: RawAiInvitation) => ({
         style: inv.style || "Modern",
         headline: inv.headline || "You're Invited!",
         body: inv.body || "",
         rsvpDeadlineText: inv.rsvpDeadlineText || "Please RSVP 2 weeks prior.",
       })),
-      musicPlaylists: (aiPlan.ideas?.musicPlaylists || []).map((pl: any) => ({
+      musicPlaylists: (aiPlan.ideas?.musicPlaylists || []).map((pl: RawAiPlaylist) => ({
         vibe: pl.vibe || "Feel-Good",
         recommendedGenres: pl.recommendedGenres || [],
         songHighlights: pl.songHighlights || [],
       })),
       speeches: (aiPlan.ideas?.speeches && aiPlan.ideas.speeches.length > 0)
-        ? aiPlan.ideas.speeches.map((s: any) => ({
+        ? aiPlan.ideas.speeches.map((s: RawAiSpeech) => ({
           title: s.title || "Keynote Toast",
           role: s.role || "Host",
           speechText: s.speechText || "",
@@ -934,9 +1019,9 @@ async function callGeminiRaw(prompt: string, apiKey: string, modelName?: string)
       const data = await res.json();
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
       if (text) return text;
-    } catch (err: any) {
-      lastError = err;
-      console.warn(`[Planora AI] Gemini plan attempt with ${model} failed:`, err?.message || err);
+    } catch (err: unknown) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[Planora AI] Gemini plan attempt with ${model} failed:`, lastError.message);
     }
   }
 
@@ -1792,9 +1877,9 @@ async function callGeminiChat(
           suggestedActions: inferSuggestedActions(userMessage),
         };
       }
-    } catch (err: any) {
-      lastError = err;
-      console.warn(`[Planora AI] Gemini chat attempt with ${model} failed:`, err?.message || err);
+    } catch (err: unknown) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[Planora AI] Gemini chat attempt with ${model} failed:`, lastError.message);
     }
   }
 

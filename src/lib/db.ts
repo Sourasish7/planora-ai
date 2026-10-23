@@ -479,6 +479,12 @@ export const db = {
     return database.userSettings;
   },
 
+  // Audit Logs
+  getAuditLogs(): PlanoraDatabase["auditLogs"] {
+    const database = getDb();
+    return database.auditLogs;
+  },
+
   // Reset database to seed
   resetToSeed(): void {
     persistDb(JSON.parse(JSON.stringify(SEED_DATA)));

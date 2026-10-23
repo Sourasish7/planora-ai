@@ -20,6 +20,9 @@ import { formatCurrency } from "@/lib/utils";
 import { getBudgetTier, getDecorationsForEvent, getEstimatedSupplyCost } from "@/lib/ai-engine";
 import { ActiveTab } from "../TabNavigation";
 
+// Module-level persistent cache across tab switching
+const webImageMemoryCache = new Map<string, string>();
+
 interface OverviewTabProps {
   event: EventPlan;
   onNavigateTab: (tab: ActiveTab) => void;
@@ -332,15 +335,27 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
     return rawItem.charAt(0).toUpperCase() + rawItem.slice(1).trim();
   };
 
-  const [webImages, setWebImages] = React.useState<Record<string, string>>({});
+  const [webImages, setWebImages] = React.useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    webImageMemoryCache.forEach((val, key) => {
+      initial[key] = val;
+    });
+    return initial;
+  });
 
   const fetchWebImage = React.useCallback(async (itemName: string) => {
     const simple = toSimpleName(itemName);
+    if (webImageMemoryCache.has(simple)) {
+      const cached = webImageMemoryCache.get(simple)!;
+      setWebImages((prev) => (prev[simple] === cached ? prev : { ...prev, [simple]: cached }));
+      return;
+    }
     try {
       const res = await fetch(`/api/search-image?q=${encodeURIComponent(simple)}`);
       if (res.ok) {
         const data = await res.json();
         if (data.imageUrl) {
+          webImageMemoryCache.set(simple, data.imageUrl);
           setWebImages((prev) => ({ ...prev, [simple]: data.imageUrl }));
         }
       }

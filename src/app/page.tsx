@@ -10,9 +10,18 @@ import { TimelineTab } from "@/components/tabs/TimelineTab";
 import { VendorsTab } from "@/components/tabs/VendorsTab";
 import { IdeasTab } from "@/components/tabs/IdeasTab";
 import { AICopilotTab } from "@/components/tabs/AICopilotTab";
-import { NewEventModal } from "@/components/NewEventModal";
-import { SettingsModal } from "@/components/SettingsModal";
+import dynamic from "next/dynamic";
 import { PrintableExpenseReport } from "@/components/PrintableExpenseReport";
+
+// Dynamic code splitting for heavy interactive modals to optimize initial bundle size & TTI
+const NewEventModal = dynamic(
+  () => import("@/components/NewEventModal").then((mod) => mod.NewEventModal),
+  { ssr: false }
+);
+const SettingsModal = dynamic(
+  () => import("@/components/SettingsModal").then((mod) => mod.SettingsModal),
+  { ssr: false }
+);
 import {
   EventPlan,
   GenerateEventPlanInput,

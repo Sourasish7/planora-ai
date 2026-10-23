@@ -42,25 +42,54 @@ const WEB_IMAGE_REGISTRY: Record<string, string> = {
   "table runner": "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80",
 };
 
+// In-memory LRU-style cache to prevent redundant external network requests
+const searchCache = new Map<string, string>();
+
+interface WikiThumbnail {
+  source?: string;
+  width?: number;
+  height?: number;
+}
+
+interface WikiPage {
+  pageid?: number;
+  title?: string;
+  thumbnail?: WikiThumbnail;
+}
+
+interface WikiQueryResponse {
+  query?: {
+    pages?: Record<string, WikiPage>;
+  };
+}
+
 /**
  * Searches the web for a matching celebration / party decoration image
  */
 async function searchWebForImage(term: string): Promise<string | null> {
   const normalized = term.toLowerCase().trim();
 
-  // 1. Direct registry lookup
-  if (WEB_IMAGE_REGISTRY[normalized]) {
-    return WEB_IMAGE_REGISTRY[normalized];
+  // 1. Check in-memory search cache
+  if (searchCache.has(normalized)) {
+    return searchCache.get(normalized)!;
   }
 
-  // 2. Keyword containment matching
+  // 2. Direct registry lookup
+  if (WEB_IMAGE_REGISTRY[normalized]) {
+    const url = WEB_IMAGE_REGISTRY[normalized];
+    searchCache.set(normalized, url);
+    return url;
+  }
+
+  // 3. Keyword containment matching
   for (const [key, url] of Object.entries(WEB_IMAGE_REGISTRY)) {
     if (normalized.includes(key) || key.includes(normalized)) {
+      searchCache.set(normalized, url);
       return url;
     }
   }
 
-  // 3. Live Wikipedia search query for arbitrary custom items
+  // 4. Live Wikipedia search query for arbitrary custom items
   const queries = [`party ${term}`, `${term} celebration`, term];
   for (const q of queries) {
     try {
@@ -72,14 +101,16 @@ async function searchWebForImage(term: string): Promise<string | null> {
         signal: AbortSignal.timeout(3000),
       });
       if (res.ok) {
-        const data = await res.json();
-        const pages: any[] = Object.values(data?.query?.pages || {});
+        const data: WikiQueryResponse = await res.json();
+        const pages = Object.values(data?.query?.pages || {});
         for (const page of pages) {
           if (
             page.thumbnail?.source &&
             !page.thumbnail.source.endsWith(".svg.png")
           ) {
-            return page.thumbnail.source;
+            const foundUrl = page.thumbnail.source;
+            searchCache.set(normalized, foundUrl);
+            return foundUrl;
           }
         }
       }
@@ -88,8 +119,10 @@ async function searchWebForImage(term: string): Promise<string | null> {
     }
   }
 
-  // 4. Default high-quality celebration backdrop
-  return "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80";
+  // 5. Default high-quality celebration backdrop fallback
+  const fallbackUrl = "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80";
+  searchCache.set(normalized, fallbackUrl);
+  return fallbackUrl;
 }
 
 export async function GET(request: NextRequest) {
@@ -98,23 +131,37 @@ export async function GET(request: NextRequest) {
 
   try {
     const imageUrl = await searchWebForImage(q);
-    return NextResponse.json({
-      query: q,
-      imageUrl,
-      source: "web_search",
-      success: true,
-    });
-  } catch (error: any) {
+    return NextResponse.json(
+      {
+        query: q,
+        imageUrl,
+        source: "web_search",
+        success: true,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+        },
+      }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         query: q,
         imageUrl:
           "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80",
         source: "fallback",
-        error: error.message,
+        error: errorMessage,
         success: false,
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      }
     );
   }
 }
+
