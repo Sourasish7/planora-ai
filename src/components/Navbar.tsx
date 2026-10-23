@@ -52,15 +52,18 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Neobrutalist Brand Logo (Matching Reference Image) */}
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eefc27] border-2 border-black shadow-[2px_2px_0px_0px_#000] select-none p-2">
+          <div className="flex h-10 w-10 min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] flex-shrink-0 items-center justify-center rounded-xl bg-[#eefc27] border-2 border-black shadow-[2px_2px_0px_0px_#000] select-none p-2 overflow-hidden">
             <svg
+              width="24"
+              height="24"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="h-full w-full text-black"
+              className="h-6 w-6 max-h-6 max-w-6 text-black flex-shrink-0"
+              style={{ width: "24px", height: "24px", maxWidth: "24px", maxHeight: "24px" }}
             >
               <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
               <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66" />

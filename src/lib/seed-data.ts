@@ -5,6 +5,7 @@ export const SEED_DATA: PlanoraDatabase = {
   userSettings: {
     preferredCurrency: "USD",
     aiProvider: "auto",
+    aiModel: "",
     theme: "dark",
   },
   auditLogs: [

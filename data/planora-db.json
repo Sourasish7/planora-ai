@@ -1,12 +1,1125 @@
 {
-  "events": [],
+  "events": [
+    {
+      "title": "Harsh Birthday",
+      "eventType": "birthday",
+      "theme": "Electric Neon Arcade & Disco Retro",
+      "date": "2026-11-22",
+      "location": "Nhi Janta",
+      "guestCount": 2,
+      "currency": "INR",
+      "totalBudget": 200,
+      "notes": "Special notes: Nhi Janta",
+      "budgetAllocations": [
+        {
+          "id": "b-1",
+          "category": "Venue Rental",
+          "allocatedAmount": 70,
+          "spentAmount": 0,
+          "notes": "Party room, rooftop or venue booking (35% of total budget)"
+        },
+        {
+          "id": "b-2",
+          "category": "Food & Finger Bites",
+          "allocatedAmount": 50,
+          "spentAmount": 0,
+          "notes": "Buffet or passed appetizers (25% of total budget)"
+        },
+        {
+          "id": "b-3",
+          "category": "Cake & Custom Sweets",
+          "allocatedAmount": 20,
+          "spentAmount": 0,
+          "notes": "Showstopper tiered or themed cake (10% of total budget)"
+        },
+        {
+          "id": "b-4",
+          "category": "Drinks & Mocktails/Cocktails",
+          "allocatedAmount": 24,
+          "spentAmount": 0,
+          "notes": "Beverage bar and mixes (12% of total budget)"
+        },
+        {
+          "id": "b-5",
+          "category": "Decor & Photobooth",
+          "allocatedAmount": 20,
+          "spentAmount": 0,
+          "notes": "Balloons, backdrop, lighting props (10% of total budget)"
+        },
+        {
+          "id": "b-6",
+          "category": "Entertainment & Games",
+          "allocatedAmount": 16,
+          "spentAmount": 0,
+          "notes": "DJ, performer or party games (8% of total budget)"
+        }
+      ],
+      "expenses": [],
+      "milestones": [
+        {
+          "id": "m-1",
+          "timeframe": "4 Weeks Before",
+          "title": "Lock Down Venue & Theme",
+          "description": "Confirm location booking, theme color palette, and party playlist vibe.",
+          "completed": true
+        },
+        {
+          "id": "m-2",
+          "timeframe": "3 Weeks Before",
+          "title": "Send Invitations & Collect RSVPs",
+          "description": "Share party link with friends and monitor attendance.",
+          "completed": false
+        },
+        {
+          "id": "m-3",
+          "timeframe": "2 Weeks Before",
+          "title": "Order Custom Cake & Order Decor",
+          "description": "Finalize cake design, flavors, and order lighting/photo props.",
+          "completed": false
+        },
+        {
+          "id": "m-4",
+          "timeframe": "3 Days Before",
+          "title": "Confirm Music Playlist & Drink Supplies",
+          "description": "Download offline music set, purchase beverage mixers and ice.",
+          "completed": false
+        },
+        {
+          "id": "m-5",
+          "timeframe": "Day of Event",
+          "title": "Setup Decor, Sound Check & Ice Bar",
+          "description": "Inflate balloon garland, place welcome signage, test speakers.",
+          "completed": false
+        }
+      ],
+      "runOfShow": [
+        {
+          "id": "ros-1",
+          "time": "06:00 PM",
+          "activity": "Host Arrival, Sound Check & Balloon Setup",
+          "personInCharge": "Host & Decorator",
+          "location": "Party Space",
+          "status": "upcoming"
+        },
+        {
+          "id": "ros-2",
+          "time": "07:30 PM",
+          "activity": "Doors Open & Signature Welcome Cocktails",
+          "personInCharge": "Bartender",
+          "location": "Welcome Bar",
+          "status": "upcoming"
+        },
+        {
+          "id": "ros-3",
+          "time": "08:30 PM",
+          "activity": "Appetizers, Mingling & Photo Booth Fun",
+          "personInCharge": "Photographer",
+          "location": "Photo Station",
+          "status": "upcoming"
+        },
+        {
+          "id": "ros-4",
+          "time": "09:30 PM",
+          "activity": "Birthday Toast, Cake Cutting & Sing-along",
+          "personInCharge": "Host",
+          "location": "Center Stage",
+          "status": "upcoming"
+        },
+        {
+          "id": "ros-5",
+          "time": "10:00 PM",
+          "activity": "Dance Floor Party & Music Anthems",
+          "personInCharge": "DJ",
+          "location": "Dance Floor",
+          "status": "upcoming"
+        },
+        {
+          "id": "ros-6",
+          "time": "12:30 AM",
+          "activity": "Party Wind-Down & Favor Bags Handout",
+          "personInCharge": "Host",
+          "location": "Exit",
+          "status": "upcoming"
+        }
+      ],
+      "vendors": [
+        {
+          "id": "v-1",
+          "name": "Nhi Janta Celebration Loft & Hall",
+          "category": "Venue",
+          "status": "booked",
+          "quotedPrice": 70,
+          "finalPrice": 70,
+          "contractSigned": true,
+          "depositPaid": true,
+          "notes": "Allocated from Venue Rental. Estimated quote: 70"
+        },
+        {
+          "id": "v-2",
+          "name": "Nhi Janta BiteCraft Catering Co.",
+          "category": "Catering",
+          "status": "quote_received",
+          "quotedPrice": 50,
+          "contractSigned": false,
+          "depositPaid": false,
+          "notes": "Allocated from Food & Finger Bites. Estimated quote: 50"
+        },
+        {
+          "id": "v-3",
+          "name": "Nhi Janta Artisan Sweets & Cake Studio",
+          "category": "Bakery & Desserts",
+          "status": "booked",
+          "quotedPrice": 20,
+          "finalPrice": 20,
+          "contractSigned": true,
+          "depositPaid": true,
+          "notes": "Allocated from Cake & Custom Sweets. Estimated quote: 20"
+        },
+        {
+          "id": "v-4",
+          "name": "Nhi Janta PourCraft Signature Mocktail Bar",
+          "category": "Beverages & Bar",
+          "status": "quote_received",
+          "quotedPrice": 24,
+          "contractSigned": false,
+          "depositPaid": false,
+          "notes": "Allocated from Drinks & Mocktails/Cocktails. Estimated quote: 24"
+        },
+        {
+          "id": "v-5",
+          "name": "Nhi Janta GlowUp Photo Props & Backdrop Styling",
+          "category": "Decor & Photobooth",
+          "status": "contacted",
+          "quotedPrice": 20,
+          "contractSigned": false,
+          "depositPaid": false,
+          "notes": "Allocated from Decor & Photobooth. Estimated quote: 20"
+        }
+      ],
+      "ideas": {
+        "themes": [
+          {
+            "name": "Electric Neon Arcade & Disco Retro",
+            "description": "Vibrant ultraviolet lasers, magenta and cyan LED glow props, 80s synthesizer vibes and glitter.",
+            "colorPalette": [
+              "#FF007F",
+              "#00F0FF",
+              "#7B2CBF",
+              "#FFE600"
+            ],
+            "vibes": "High energy, nostalgic, thrilling, photogenic",
+            "decorations": [
+              "Balloons",
+              "Candles"
+            ]
+          },
+          {
+            "name": "Velvet Speakeasy & Golden Glamour",
+            "description": "Moody vintage jazz club aesthetics, antique gold cocktail shakers, dim Edison bulbs, and velvet couches.",
+            "colorPalette": [
+              "#1C1917",
+              "#D97706",
+              "#78350F",
+              "#FAFAF9"
+            ],
+            "vibes": "Sophisticated, exclusive, jazzy, cozy",
+            "decorations": [
+              "Balloons",
+              "Candles"
+            ]
+          }
+        ],
+        "activities": [
+          {
+            "title": "Smartphone Live Speed Trivia",
+            "targetGroup": "Party Guests",
+            "description": "Buzzer-style trivia quiz on big screen with custom rounds about the birthday person's life.",
+            "duration": "25 minutes"
+          },
+          {
+            "title": "Neon Glow Stick Dance Showdown",
+            "targetGroup": "All Attendees",
+            "description": "DJ triggers blacklight and guest teams battle in fun choreographed moves.",
+            "duration": "20 minutes"
+          }
+        ],
+        "menus": [
+          {
+            "title": "Gourmet Street Food & Slider Bar",
+            "items": [
+              "Mini Angus Beef & Vegan Beyond Sliders",
+              "Loaded Truffle Parmesan Fries",
+              "Crispy Korean Fried Cauliflower Bites",
+              "Custom Tiered Celebration Cake"
+            ],
+            "dietaryHighlights": [
+              "Vegetarian & Dairy-Free options"
+            ]
+          }
+        ],
+        "invitationTemplates": [
+          {
+            "style": "Contemporary & Polished",
+            "headline": "You're Cordially Invited to Celebrate: BIRTHDAY",
+            "body": "We are thrilled to gather our favorite people for an extraordinary celebration filled with joy, connection, and unforgettable moments. Your presence would make this milestone complete.",
+            "rsvpDeadlineText": "Kindly RSVP via Planora Portal 2 weeks prior to event date."
+          },
+          {
+            "style": "Casual & Warm",
+            "headline": "Save the Date for an Unmissable Celebration!",
+            "body": "Get ready for delicious bites, great music, and memories in the making. Dress comfortably, bring your best energy, and let's make this day legendary!",
+            "rsvpDeadlineText": "Please let us know if you can make it by the deadline."
+          }
+        ],
+        "musicPlaylists": [
+          {
+            "vibe": "Euphoric & Uplifting Hits",
+            "recommendedGenres": [
+              "Feel-Good Pop",
+              "Indie Anthems",
+              "Nu-Disco",
+              "Timeless Classics"
+            ],
+            "songHighlights": [
+              "September - Earth, Wind & Fire",
+              "Levitating - Dua Lipa",
+              "Can't Stop The Feeling - Justin Timberlake",
+              "Dreams - Fleetwood Mac"
+            ]
+          },
+          {
+            "vibe": "Lounge & Ambient Warmth",
+            "recommendedGenres": [
+              "Lo-Fi Chill",
+              "Bossa Nova",
+              "Acoustic Covers",
+              "Neo-Soul"
+            ],
+            "songHighlights": [
+              "Beyond - Leon Bridges",
+              "Come Away With Me - Norah Jones",
+              "Golden - Harry Styles (Acoustic)"
+            ]
+          }
+        ],
+        "speeches": [
+          {
+            "title": "Host Welcome & Opening Toast for \"Harsh Birthday\"",
+            "role": "Host / Celebrant",
+            "speechText": "Good evening everyone! Thank you so much for being here at Nhi Janta to celebrate Harsh Birthday. Having each of our 2 guests gathered in this room means the absolute world to me. Tonight is all about great memories, wonderful conversations, and unforgettable celebrations. Let's raise our glasses to good times and cherished friends—cheers!",
+            "deliveryTips": "Deliver with a warm smile right after welcome drinks are served. Keep it around 2 minutes."
+          },
+          {
+            "title": "Heartfelt Toast to Harsh",
+            "role": "Best Friend / VIP Guest",
+            "speechText": "To Harsh: watching you reach this milestone is such an honor for all of us. You bring unmatched energy, kindness, and laughter everywhere you go. On behalf of everyone here at Harsh Birthday, we wish you the happiest year ahead, filled with health, big dreams, and pure joy. To Harsh!",
+            "deliveryTips": "Best given right before the cake cutting or keynote dinner segment. Raise your glass at the end."
+          },
+          {
+            "title": "Vote of Thanks & Cake Cutting Address",
+            "role": "Celebrant / Host",
+            "speechText": "Before we cut the cake and hit the dance floor, I want to say a huge heartfelt thank you to everyone who helped bring Harsh Birthday together—especially our wonderful friends, family, and organizers. Your love and presence tonight made this day truly magical. Thank you all, and let's enjoy the rest of the night!",
+            "deliveryTips": "Gather everyone around the cake table. Keep it sweet, punchy, and energetic."
+          }
+        ]
+      },
+      "guests": [
+        {
+          "id": "g-1",
+          "name": "Guest of Honor / VIP 1",
+          "rsvpStatus": "attending",
+          "plusOnes": 1,
+          "dietary": "Standard",
+          "invitationSent": true
+        },
+        {
+          "id": "g-2",
+          "name": "Family Representative",
+          "rsvpStatus": "attending",
+          "plusOnes": 2,
+          "dietary": "Vegetarian",
+          "invitationSent": true
+        },
+        {
+          "id": "g-3",
+          "name": "Key Organizer / Coordinator",
+          "rsvpStatus": "attending",
+          "plusOnes": 0,
+          "dietary": "Gluten-Free",
+          "invitationSent": true
+        }
+      ],
+      "chatHistory": [
+        {
+          "id": "c-init-1792724413687",
+          "role": "assistant",
+          "content": "🎉 I have created your complete blueprint for \"Harsh Birthday\"!\n\n• Budget: INR 200 (6 allocated categories)\n• Estimated Guests: 2\n• Timeline: 5 milestones & 6 day-of schedule blocks\n• Vendors: 5 curated vendor categories\n\nYou can chat with me below to customize any detail, reallocate budgets, add custom games, or generate invitations!",
+          "timestamp": "2026-10-23T03:00:13.687Z",
+          "suggestedActions": [
+            {
+              "label": "Add Vendor",
+              "action": "OPEN_VENDOR_MODAL"
+            },
+            {
+              "label": "Adjust Budget",
+              "action": "OPEN_BUDGET_TAB"
+            },
+            {
+              "label": "View Day-of Run of Show",
+              "action": "OPEN_TIMELINE_TAB"
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": "Can you give me invitiation mail for my friends",
+          "id": "c-1792725053214-icjy",
+          "timestamp": "2026-10-23T03:10:53.214Z"
+        },
+        {
+          "role": "assistant",
+          "content": "✉️ **Personalized Invitation & Announcement Copy**:\n\n**Subject**: You're Invited: Celebrating Harsh Birthday! 🥂\n\n*Dear [Guest Name],*\n\nWe couldn't imagine marking this special milestone without the people who mean the most to us. Please join us for an evening of joy, celebration, and cherished memories!\n\n📅 **Date**: 2026-11-22\n📍 **Location**: Nhi Janta\n✨ **Theme**: Electric Neon Arcade & Disco Retro\n\nKindly confirm your RSVP and let us know about any dietary preferences by clicking the link below.\n\nWith love and excitement,\n*The Hosts*",
+          "suggestedActions": [
+            {
+              "label": "View Guest List",
+              "action": "OPEN_GUESTS_TAB"
+            }
+          ],
+          "id": "c-1792725054092-8bvw",
+          "timestamp": "2026-10-23T03:10:54.092Z"
+        },
+        {
+          "role": "user",
+          "content": "Thank you",
+          "id": "c-1792725132008-d8ue",
+          "timestamp": "2026-10-23T03:12:12.008Z"
+        },
+        {
+          "role": "assistant",
+          "content": "I'm here to help you plan every detail of **Harsh Birthday**! Here's what I can help with:\n\n• 💰 **Budget**: \"How can I optimize my INR 200 budget?\"\n• 🎤 **Speeches**: \"Write a birthday speech\" or \"Draft a welcome toast\"\n• 🎉 **Activities**: \"Suggest fun games for 2 guests\"\n• ✉️ **Invitations**: \"Write an invitation email\"\n• 📋 **Vendors**: \"Review my vendor bookings\"\n• 📅 **Timeline**: \"Show my event schedule\"\n• 🍽️ **Menu**: \"Suggest a vegetarian menu\"\n• 🎶 **Music**: \"Create a party playlist\"\n• 🎨 **Decor**: \"Suggest decor ideas for Electric Neon Arcade & Disco Retro\"\n\nJust type your question and I'll provide personalized advice!",
+          "suggestedActions": [
+            {
+              "label": "Review Budget",
+              "action": "OPEN_BUDGET_TAB"
+            },
+            {
+              "label": "Check Timeline",
+              "action": "OPEN_TIMELINE_TAB"
+            },
+            {
+              "label": "View Ideas",
+              "action": "OPEN_IDEAS_TAB"
+            }
+          ],
+          "id": "c-1792725133177-5h8n",
+          "timestamp": "2026-10-23T03:12:13.178Z"
+        },
+        {
+          "role": "user",
+          "content": "Hey, How are you",
+          "id": "c-1792725148731-nwjc",
+          "timestamp": "2026-10-23T03:12:28.731Z"
+        },
+        {
+          "role": "assistant",
+          "content": "I'm here to help you plan every detail of **Harsh Birthday**! Here's what I can help with:\n\n• 💰 **Budget**: \"How can I optimize my INR 200 budget?\"\n• 🎤 **Speeches**: \"Write a birthday speech\" or \"Draft a welcome toast\"\n• 🎉 **Activities**: \"Suggest fun games for 2 guests\"\n• ✉️ **Invitations**: \"Write an invitation email\"\n• 📋 **Vendors**: \"Review my vendor bookings\"\n• 📅 **Timeline**: \"Show my event schedule\"\n• 🍽️ **Menu**: \"Suggest a vegetarian menu\"\n• 🎶 **Music**: \"Create a party playlist\"\n• 🎨 **Decor**: \"Suggest decor ideas for Electric Neon Arcade & Disco Retro\"\n\nJust type your question and I'll provide personalized advice!",
+          "suggestedActions": [
+            {
+              "label": "Review Budget",
+              "action": "OPEN_BUDGET_TAB"
+            },
+            {
+              "label": "Check Timeline",
+              "action": "OPEN_TIMELINE_TAB"
+            },
+            {
+              "label": "View Ideas",
+              "action": "OPEN_IDEAS_TAB"
+            }
+          ],
+          "id": "c-1792725149859-r7cv",
+          "timestamp": "2026-10-23T03:12:29.859Z"
+        },
+        {
+          "role": "user",
+          "content": "Can you draft a invitation mail for my friends",
+          "id": "c-1792725165139-i7gx",
+          "timestamp": "2026-10-23T03:12:45.139Z"
+        },
+        {
+          "role": "assistant",
+          "content": "✉️ **Personalized Invitation & Announcement Copy**:\n\n**Subject**: You're Invited: Celebrating Harsh Birthday! 🥂\n\n*Dear [Guest Name],*\n\nWe couldn't imagine marking this special milestone without the people who mean the most to us. Please join us for an evening of joy, celebration, and cherished memories!\n\n📅 **Date**: 2026-11-22\n📍 **Location**: Nhi Janta\n✨ **Theme**: Electric Neon Arcade & Disco Retro\n\nKindly confirm your RSVP and let us know about any dietary preferences by clicking the link below.\n\nWith love and excitement,\n*The Hosts*",
+          "suggestedActions": [
+            {
+              "label": "View Guest List",
+              "action": "OPEN_GUESTS_TAB"
+            }
+          ],
+          "id": "c-1792725165935-fs9j",
+          "timestamp": "2026-10-23T03:12:45.935Z"
+        }
+      ],
+      "id": "evt-1792724413687-di1en",
+      "createdAt": "2026-10-23T03:00:13.687Z",
+      "updatedAt": "2026-10-23T03:12:45.935Z"
+    }
+  ],
   "userSettings": {
     "preferredCurrency": "INR",
-    "aiProvider": "auto",
+    "aiProvider": "gemini",
+    "aiModel": "gemini-3.8-flash",
     "theme": "dark",
     "apiKey": ""
   },
   "auditLogs": [
+    {
+      "id": "log-1792725165936",
+      "timestamp": "2026-10-23T03:12:45.936Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725165142",
+      "timestamp": "2026-10-23T03:12:45.142Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725149859",
+      "timestamp": "2026-10-23T03:12:29.859Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725148732",
+      "timestamp": "2026-10-23T03:12:28.732Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725133178",
+      "timestamp": "2026-10-23T03:12:13.178Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725132009",
+      "timestamp": "2026-10-23T03:12:12.009Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725054092",
+      "timestamp": "2026-10-23T03:10:54.092Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792725053214",
+      "timestamp": "2026-10-23T03:10:53.214Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Harsh Birthday'"
+    },
+    {
+      "id": "log-1792724413688",
+      "timestamp": "2026-10-23T03:00:13.687Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Harsh Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792724372727",
+      "timestamp": "2026-10-23T02:59:32.727Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792691073844-xbimx"
+    },
+    {
+      "id": "log-1792691122097",
+      "timestamp": "2026-10-22T17:45:22.097Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792691122093-ej1hd"
+    },
+    {
+      "id": "log-1792691122095",
+      "timestamp": "2026-10-22T17:45:22.095Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792691122094",
+      "timestamp": "2026-10-22T17:45:22.093Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792691073845",
+      "timestamp": "2026-10-22T17:44:33.844Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'bhai birthday' (birthday)"
+    },
+    {
+      "id": "log-1792690997228",
+      "timestamp": "2026-10-22T17:43:17.228Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792690997226-41p4p"
+    },
+    {
+      "id": "log-1792690997227",
+      "timestamp": "2026-10-22T17:43:17.227Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792690997226",
+      "timestamp": "2026-10-22T17:43:17.225Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792690973873",
+      "timestamp": "2026-10-22T17:42:53.873Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792690973870-prgce"
+    },
+    {
+      "id": "log-1792690973871",
+      "timestamp": "2026-10-22T17:42:53.871Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792690973870",
+      "timestamp": "2026-10-22T17:42:53.869Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792690604818",
+      "timestamp": "2026-10-22T17:36:44.818Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792690426053-9takh"
+    },
+    {
+      "id": "log-1792690426054",
+      "timestamp": "2026-10-22T17:33:46.053Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Harsh Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792690405482",
+      "timestamp": "2026-10-22T17:33:25.482Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792688381599-uo1e0"
+    },
+    {
+      "id": "log-1792689795001",
+      "timestamp": "2026-10-22T17:23:15.001Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792689794999-5xyj5"
+    },
+    {
+      "id": "log-1792689795000",
+      "timestamp": "2026-10-22T17:23:15.000Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792689794999",
+      "timestamp": "2026-10-22T17:23:14.998Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792689507303",
+      "timestamp": "2026-10-22T17:18:27.303Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792689507299-oh4c5"
+    },
+    {
+      "id": "log-1792689507301",
+      "timestamp": "2026-10-22T17:18:27.301Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792689507299",
+      "timestamp": "2026-10-22T17:18:27.298Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792688381601",
+      "timestamp": "2026-10-22T16:59:41.599Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sarah's 30th Birthday Bash' (birthday)"
+    },
+    {
+      "id": "log-1792688232132",
+      "timestamp": "2026-10-22T16:57:12.132Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792688232129-og841"
+    },
+    {
+      "id": "log-1792688232131",
+      "timestamp": "2026-10-22T16:57:12.131Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792688232130",
+      "timestamp": "2026-10-22T16:57:12.129Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792688070511",
+      "timestamp": "2026-10-22T16:54:30.511Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792679199449-qh8cz"
+    },
+    {
+      "id": "log-1792679231144",
+      "timestamp": "2026-10-22T14:27:11.144Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792679231140-svgtl"
+    },
+    {
+      "id": "log-1792679231142",
+      "timestamp": "2026-10-22T14:27:11.142Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792679231141",
+      "timestamp": "2026-10-22T14:27:11.139Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792679199449",
+      "timestamp": "2026-10-22T14:26:39.449Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Birthday Bash' (birthday)"
+    },
+    {
+      "id": "log-1792679110206",
+      "timestamp": "2026-10-22T14:25:10.206Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792679110203-p87rm"
+    },
+    {
+      "id": "log-1792679110205",
+      "timestamp": "2026-10-22T14:25:10.205Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792679110203",
+      "timestamp": "2026-10-22T14:25:10.203Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792679020285",
+      "timestamp": "2026-10-22T14:23:40.285Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792678589518-aateu"
+    },
+    {
+      "id": "log-1792678763975",
+      "timestamp": "2026-10-22T14:19:23.975Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Birthday'"
+    },
+    {
+      "id": "log-1792678763519",
+      "timestamp": "2026-10-22T14:19:23.519Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Birthday'"
+    },
+    {
+      "id": "log-1792678761646",
+      "timestamp": "2026-10-22T14:19:21.646Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Birthday'"
+    },
+    {
+      "id": "log-1792678761551",
+      "timestamp": "2026-10-22T14:19:21.551Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Birthday'"
+    },
+    {
+      "id": "log-1792678589518",
+      "timestamp": "2026-10-22T14:16:29.518Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792678558946",
+      "timestamp": "2026-10-22T14:15:58.946Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676767200-fcbu0"
+    },
+    {
+      "id": "log-1792678450930",
+      "timestamp": "2026-10-22T14:14:10.930Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792678450927-rg1ef"
+    },
+    {
+      "id": "log-1792678450929",
+      "timestamp": "2026-10-22T14:14:10.929Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792678450927",
+      "timestamp": "2026-10-22T14:14:10.927Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792677668846",
+      "timestamp": "2026-10-22T14:01:08.846Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792677668844-zepz3"
+    },
+    {
+      "id": "log-1792677668845",
+      "timestamp": "2026-10-22T14:01:08.845Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792677668844",
+      "timestamp": "2026-10-22T14:01:08.843Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792676767201",
+      "timestamp": "2026-10-22T13:46:07.200Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test' (wedding)"
+    },
+    {
+      "id": "log-1792676677569",
+      "timestamp": "2026-10-22T13:44:37.569Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676677566-5eknb"
+    },
+    {
+      "id": "log-1792676677568",
+      "timestamp": "2026-10-22T13:44:37.568Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792676677566",
+      "timestamp": "2026-10-22T13:44:37.565Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792676384375",
+      "timestamp": "2026-10-22T13:39:44.375Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676375163-ad4h7"
+    },
+    {
+      "id": "log-1792676384355",
+      "timestamp": "2026-10-22T13:39:44.355Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday Party'"
+    },
+    {
+      "id": "log-1792676375189",
+      "timestamp": "2026-10-22T13:39:35.189Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday Party'"
+    },
+    {
+      "id": "log-1792676375164",
+      "timestamp": "2026-10-22T13:39:35.163Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday Party' (birthday)"
+    },
+    {
+      "id": "log-1792676315219",
+      "timestamp": "2026-10-22T13:38:35.219Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676303296-1d51b"
+    },
+    {
+      "id": "log-1792676310523",
+      "timestamp": "2026-10-22T13:38:30.523Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676284109-36m5a"
+    },
+    {
+      "id": "log-1792676303443",
+      "timestamp": "2026-10-22T13:38:23.443Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday Party'"
+    },
+    {
+      "id": "log-1792676303296",
+      "timestamp": "2026-10-22T13:38:23.296Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday Party' (birthday)"
+    },
+    {
+      "id": "log-1792676284110",
+      "timestamp": "2026-10-22T13:38:04.109Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792676182383",
+      "timestamp": "2026-10-22T13:36:22.383Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676182381-bwhku"
+    },
+    {
+      "id": "log-1792676182382",
+      "timestamp": "2026-10-22T13:36:22.382Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792676182381",
+      "timestamp": "2026-10-22T13:36:22.380Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792676141339",
+      "timestamp": "2026-10-22T13:35:41.339Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676141336-lo0kk"
+    },
+    {
+      "id": "log-1792676141338",
+      "timestamp": "2026-10-22T13:35:41.338Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792676141336",
+      "timestamp": "2026-10-22T13:35:41.335Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792676123008",
+      "timestamp": "2026-10-22T13:35:23.008Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676123004-ekv1z"
+    },
+    {
+      "id": "log-1792676123007",
+      "timestamp": "2026-10-22T13:35:23.007Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792676123005",
+      "timestamp": "2026-10-22T13:35:23.004Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792676094607",
+      "timestamp": "2026-10-22T13:34:54.607Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792676094605-mj9dx"
+    },
+    {
+      "id": "log-1792676094607",
+      "timestamp": "2026-10-22T13:34:54.607Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792676094605",
+      "timestamp": "2026-10-22T13:34:54.605Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792674667280",
+      "timestamp": "2026-10-22T13:11:07.280Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792674647616-6svu4"
+    },
+    {
+      "id": "log-1792674647616",
+      "timestamp": "2026-10-22T13:10:47.616Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792674638416",
+      "timestamp": "2026-10-22T13:10:38.416Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792673672040-bwx38"
+    },
+    {
+      "id": "log-1792674611439",
+      "timestamp": "2026-10-22T13:10:11.439Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792674610955",
+      "timestamp": "2026-10-22T13:10:10.955Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792674597749",
+      "timestamp": "2026-10-22T13:09:57.749Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792674597032",
+      "timestamp": "2026-10-22T13:09:57.032Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792674535898",
+      "timestamp": "2026-10-22T13:08:55.898Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792674535895-rlu0j"
+    },
+    {
+      "id": "log-1792674535897",
+      "timestamp": "2026-10-22T13:08:55.897Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792674535896",
+      "timestamp": "2026-10-22T13:08:55.895Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792674204138",
+      "timestamp": "2026-10-22T13:03:24.138Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792674204135-3xh46"
+    },
+    {
+      "id": "log-1792674204137",
+      "timestamp": "2026-10-22T13:03:24.137Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792674204135",
+      "timestamp": "2026-10-22T13:03:24.134Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792673732206",
+      "timestamp": "2026-10-22T12:55:32.206Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673731741",
+      "timestamp": "2026-10-22T12:55:31.741Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673721587",
+      "timestamp": "2026-10-22T12:55:21.587Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673721143",
+      "timestamp": "2026-10-22T12:55:21.143Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673705495",
+      "timestamp": "2026-10-22T12:55:05.495Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673704981",
+      "timestamp": "2026-10-22T12:55:04.981Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Sourasish Birthday'"
+    },
+    {
+      "id": "log-1792673672041",
+      "timestamp": "2026-10-22T12:54:32.040Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Sourasish Birthday' (birthday)"
+    },
+    {
+      "id": "log-1792673440026",
+      "timestamp": "2026-10-22T12:50:40.026Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792673440024-s37mz"
+    },
+    {
+      "id": "log-1792673440025",
+      "timestamp": "2026-10-22T12:50:40.025Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792673440024",
+      "timestamp": "2026-10-22T12:50:40.023Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792673169812",
+      "timestamp": "2026-10-22T12:46:09.812Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792673169810-olizi"
+    },
+    {
+      "id": "log-1792673169811",
+      "timestamp": "2026-10-22T12:46:09.811Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792673169810",
+      "timestamp": "2026-10-22T12:46:09.809Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
+    {
+      "id": "log-1792672905342",
+      "timestamp": "2026-10-22T12:41:45.342Z",
+      "action": "DELETE_EVENT",
+      "details": "Deleted event ID: evt-1792672905338-xs5b5"
+    },
+    {
+      "id": "log-1792672905340",
+      "timestamp": "2026-10-22T12:41:45.340Z",
+      "action": "UPDATE_EVENT",
+      "details": "Updated event 'Updated Test Event'"
+    },
+    {
+      "id": "log-1792672905339",
+      "timestamp": "2026-10-22T12:41:45.338Z",
+      "action": "CREATE_EVENT",
+      "details": "Created event 'Test Unit Event' (birthday)"
+    },
     {
       "id": "log-1792657274835",
       "timestamp": "2026-10-22T08:21:14.835Z",

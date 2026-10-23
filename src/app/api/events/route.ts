@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { generateAutonomousPlan } from "@/lib/ai-engine";
+import { generateAIPlan } from "@/lib/ai-engine";
 import { EventPlanInputSchema, checkRateLimit } from "@/lib/security";
 
 export async function GET(req: NextRequest) {
@@ -40,8 +40,14 @@ export async function POST(req: NextRequest) {
 
     const input = validation.data;
 
-    // Use AI Engine to generate the full blueprint
-    const eventBlueprint = generateAutonomousPlan(input);
+    // Read user settings to determine AI provider, model, and API key
+    const settings = db.getSettings();
+    const apiKey = input.apiKey || settings.apiKey || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+    const provider = settings.aiProvider || "auto";
+    const model = settings.aiModel;
+
+    // Use AI Engine to generate the full blueprint (Gemini/OpenAI if key available, else autonomous)
+    const eventBlueprint = await generateAIPlan(input, apiKey, provider, model);
 
     // Save into database
     const created = db.createEvent(eventBlueprint);

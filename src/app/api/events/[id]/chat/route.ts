@@ -29,6 +29,7 @@ export async function POST(
     const settings = db.getSettings();
     const apiKey = body.apiKey || settings.apiKey || process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
     const provider = body.provider || settings.aiProvider || "auto";
+    const model = body.model || settings.aiModel;
 
     // 1. Record user message in DB
     db.addChatMessage(params.id, {
@@ -37,7 +38,7 @@ export async function POST(
     });
 
     // 2. Process via AI engine
-    const aiResponse = await processAIChat(event, cleanMessage, apiKey, provider);
+    const aiResponse = await processAIChat(event, cleanMessage, apiKey, provider, model);
 
     // 3. Record assistant response in DB
     const assistantMsg = db.addChatMessage(params.id, {

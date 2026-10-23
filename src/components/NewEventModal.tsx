@@ -70,13 +70,16 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
     e.preventDefault();
     if (!title.trim() || isLoading) return;
 
+    const parsedBudget = parseFloat(budget);
+    const parsedGuests = parseInt(guestCount, 10);
+
     await onSubmit({
       title: title.trim(),
       eventType,
       date,
-      budget: parseFloat(budget) || 10000,
+      budget: !isNaN(parsedBudget) ? Math.max(0, parsedBudget) : 1000,
       currency,
-      guestCount: parseInt(guestCount, 10) || 50,
+      guestCount: !isNaN(parsedGuests) && parsedGuests > 0 ? Math.max(1, parsedGuests) : 10,
       location: location.trim(),
       stylePreferences: stylePreferences.trim(),
       specialRequests: specialRequests.trim(),
@@ -167,7 +170,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
                 <input
                   type="number"
                   required
-                  min="100"
+                  min="1"
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
                   className="w-full rounded-xl border-2 border-black bg-[#faf8f2] p-2.5 text-black font-bold focus:outline-none shadow-[1.5px_1.5px_0px_0px_#000]"
@@ -196,7 +199,7 @@ export const NewEventModal: React.FC<NewEventModalProps> = ({
               <input
                 type="number"
                 required
-                min="5"
+                min="1"
                 max="50000"
                 value={guestCount}
                 onChange={(e) => setGuestCount(e.target.value)}

@@ -9,15 +9,8 @@ import type {
   Guest,
   ChatMessage,
   EventType,
+  SpeechIdea,
 } from "@/types";
-
-/**
- * Planora AI Generator & Intelligent Engine
- * Supports:
- * 1. Live Google Gemini API (gemini-1.5-flash or gemini-pro)
- * 2. Live OpenAI API (gpt-4o-mini / gpt-3.5)
- * 3. Deep Autonomous Rule-Based Knowledge Engine (works 100% offline/out-of-the-box with zero API key)
- */
 
 interface LLMResponse {
   content: string;
@@ -97,11 +90,486 @@ const BUDGET_PROFILES: Record<EventType, { category: string; pct: number; notes:
   ],
 };
 
+export type BudgetTier = "pocket" | "micro" | "budget" | "moderate" | "premium";
+
+/**
+ * Calculates budget tier according to currency and purchasing power
+ * e.g. 100 INR is ~$1.18 USD (pocket tier), whereas 100 USD is $100 USD (budget tier)
+ */
+export function getBudgetTier(budget: number, currency: string = "USD"): BudgetTier {
+  const cur = (currency || "USD").toUpperCase();
+  let usd = budget;
+  if (cur === "INR") {
+    usd = budget / 85;
+  } else if (cur === "EUR") {
+    usd = budget * 1.08;
+  } else if (cur === "GBP") {
+    usd = budget * 1.3;
+  } else if (cur === "CAD" || cur === "AUD") {
+    usd = budget * 0.72;
+  }
+
+  if (usd < 5) return "pocket";      // e.g. < ₹400 INR or < $5 USD (ultra-low pocket e.g. 100rs, 200rs)
+  if (usd < 35) return "micro";      // e.g. ₹400 - ₹3,000 INR or $5 - $35 USD (e.g. 500rs, 1000rs)
+  if (usd < 180) return "budget";    // e.g. ₹3,000 - ₹15,000 INR or $35 - $180 USD (e.g. 100$)
+  if (usd < 900) return "moderate";  // e.g. ₹15,000 - ₹75,000 INR or $180 - $900 USD
+  return "premium";                  // e.g. > ₹75,000 INR or > $900 USD
+}
+
+export function getEstimatedSupplyCost(itemName: string, currency: string = "USD"): { amount: number; formatted: string } {
+  const cur = (currency || "USD").toUpperCase();
+  const baseMapINR: Record<string, number> = {
+    Balloons: 30,
+    Candles: 20,
+    Cake: 350,
+    "Wedding Cake": 1200,
+    "Birthday Banner": 60,
+    Banner: 50,
+    "Party Poppers": 50,
+    "Party Hats": 40,
+    "Fairy Lights": 120,
+    Streamers: 30,
+    Flowers: 150,
+    "Welcome Sign": 200,
+    Ribbons: 30,
+    "Table Runner": 120,
+    "Photo Props": 100,
+    "Paper Plates & Cups": 60,
+  };
+
+  const inrAmount = baseMapINR[itemName] || 40;
+  if (cur === "INR") {
+    return { amount: inrAmount, formatted: `₹${inrAmount}` };
+  }
+  const usdAmount = Math.max(1, Math.round(inrAmount / 85));
+  if (cur === "USD") {
+    return { amount: usdAmount, formatted: `$${usdAmount}` };
+  }
+  return { amount: usdAmount, formatted: `${cur} ${usdAmount}` };
+}
+
+/**
+ * Dynamically scales decoration items and supplies strictly according to the event's budget tier.
+ * For example:
+ * - 100 INR (~$1.18 USD): Pocket tier -> 2 affordable essentials (Balloons, Candles) costing ~₹50.
+ * - 100 USD (~₹8,500 INR): Budget tier -> 8 celebration supplies (Balloons, Cake, Candles, Banner, Poppers, Hats, Fairy Lights, Streamers).
+ */
+export function getDecorationsForEvent(eventType: EventType, tier: BudgetTier = "budget"): string[] {
+  const decorMap: Record<EventType, Record<BudgetTier, string[]>> = {
+    birthday: {
+      pocket: [
+        "Balloons",
+        "Candles",
+      ],
+      micro: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Birthday Banner",
+      ],
+      budget: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Birthday Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+      ],
+      moderate: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Birthday Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+        "Photo Props",
+        "Flowers",
+      ],
+      premium: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Birthday Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+        "Photo Props",
+        "Flowers",
+        "Table Runner",
+        "Welcome Sign",
+      ],
+    },
+    wedding: {
+      pocket: [
+        "Flowers",
+        "Candles",
+      ],
+      micro: [
+        "Flowers",
+        "Wedding Cake",
+        "Candles",
+        "Fairy Lights",
+      ],
+      budget: [
+        "Flowers",
+        "Wedding Cake",
+        "Candles",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Ribbons",
+        "Table Runner",
+      ],
+      moderate: [
+        "Flowers",
+        "Wedding Cake",
+        "Candles",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Ribbons",
+        "Table Runner",
+        "Photo Props",
+        "Streamers",
+      ],
+      premium: [
+        "Flowers",
+        "Wedding Cake",
+        "Candles",
+        "Fairy Lights",
+        "Welcome Sign",
+        "Ribbons",
+        "Table Runner",
+        "Balloons",
+        "Photo Props",
+        "Streamers",
+        "Party Poppers",
+        "Paper Plates & Cups",
+      ],
+    },
+    anniversary: {
+      pocket: [
+        "Balloons",
+        "Candles",
+      ],
+      micro: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+      ],
+      budget: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Flowers",
+        "Table Runner",
+        "Party Poppers",
+      ],
+      moderate: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Flowers",
+        "Table Runner",
+        "Party Poppers",
+        "Photo Props",
+      ],
+      premium: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Flowers",
+        "Table Runner",
+        "Party Poppers",
+        "Photo Props",
+        "Welcome Sign",
+      ],
+    },
+    community_event: {
+      pocket: [
+        "Banner",
+        "Balloons",
+      ],
+      micro: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+      ],
+      budget: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Streamers",
+        "Flowers",
+        "Party Hats",
+      ],
+      moderate: [
+        "Vinyl Welcome Arch",
+        "Festoon Lights",
+        "Directional Signs",
+        "Stall Canopies",
+        "Stage Backdrop",
+        "Eco Bunting",
+        "Wildflower Centerpieces",
+        "Recycling Stations",
+      ],
+      premium: [
+        "Grand Welcome Arch",
+        "Festoon Lighting Rig",
+        "Directional Signboards",
+        "Artisan Tents",
+        "Stage Backdrop",
+        "Amphitheater Covers",
+        "Planter Centerpieces",
+        "Eco Stations",
+      ],
+    },
+    college_festival: {
+      pocket: [
+        "Banner",
+        "Balloons",
+      ],
+      micro: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+      ],
+      budget: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Streamers",
+        "Party Poppers",
+        "Photo Props",
+      ],
+      moderate: [
+        "Truss Stage Rig",
+        "Holographic Gate",
+        "Laser Projectors",
+        "Neon Pointers",
+        "Crowd Wristbands",
+        "Campus Festoon Lights",
+        "Photo Booth",
+        "Stage Scrim",
+      ],
+      premium: [
+        "Giant LED Screen Backdrop",
+        "Truss Lighting Rig",
+        "Holographic Arches",
+        "Laser Show Lights",
+        "Crowd Glow Batons",
+        "Campus Neon Signs",
+        "Stage Scrim",
+        "VIP Lounge Decor",
+      ],
+    },
+    cultural_gathering: {
+      pocket: [
+        "Flowers",
+        "Candles",
+      ],
+      micro: [
+        "Flowers",
+        "Candles",
+        "Fairy Lights",
+        "Welcome Sign",
+      ],
+      budget: [
+        "Flowers",
+        "Candles",
+        "Fairy Lights",
+        "Welcome Sign",
+        "Ribbons",
+        "Table Runner",
+        "Streamers",
+      ],
+      moderate: [
+        "Fresh Marigold Torans",
+        "Ornate Brass Diyas",
+        "Grand Rangoli",
+        "Brocade Silk Drapes",
+        "Brass Bells",
+        "Urli Bowls",
+        "Incense Burners",
+        "Floor Cushions",
+      ],
+      premium: [
+        "Grand Floral Torans",
+        "Ornate Urli & Floating Diyas",
+        "Royal Rangoli Art",
+        "Rich Brocade Drapes",
+        "Grand Brass Bells",
+        "Carved Wood Mandap",
+        "Silk Floor Seating",
+        "Aromatic Floral Urli",
+      ],
+    },
+    baby_shower: {
+      pocket: [
+        "Balloons",
+        "Candles",
+      ],
+      micro: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+      ],
+      budget: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Ribbons",
+        "Flowers",
+        "Photo Props",
+      ],
+      moderate: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Ribbons",
+        "Flowers",
+        "Photo Props",
+        "Table Runner",
+        "Party Hats",
+      ],
+      premium: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Fairy Lights",
+        "Ribbons",
+        "Flowers",
+        "Photo Props",
+        "Table Runner",
+        "Party Hats",
+        "Welcome Sign",
+        "Party Poppers",
+      ],
+    },
+    corporate_social: {
+      pocket: [
+        "Banner",
+        "Balloons",
+      ],
+      micro: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+      ],
+      budget: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Table Runner",
+        "Flowers",
+        "Photo Props",
+      ],
+      moderate: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Table Runner",
+        "Flowers",
+        "Photo Props",
+        "Ribbons",
+      ],
+      premium: [
+        "Banner",
+        "Fairy Lights",
+        "Balloons",
+        "Welcome Sign",
+        "Table Runner",
+        "Flowers",
+        "Photo Props",
+        "Ribbons",
+        "Party Poppers",
+        "Paper Plates & Cups",
+      ],
+    },
+    custom: {
+      pocket: [
+        "Balloons",
+        "Candles",
+      ],
+      micro: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+      ],
+      budget: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+      ],
+      moderate: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+        "Photo Props",
+        "Flowers",
+      ],
+      premium: [
+        "Balloons",
+        "Cake",
+        "Candles",
+        "Banner",
+        "Party Poppers",
+        "Party Hats",
+        "Fairy Lights",
+        "Streamers",
+        "Photo Props",
+        "Flowers",
+        "Table Runner",
+        "Welcome Sign",
+      ],
+    },
+  };
+
+  const eventCategories = decorMap[eventType] || decorMap.custom;
+  return eventCategories[tier] || eventCategories.budget;
+}
+
 // Generates an end-to-end plan using the internal AI rules
 export function generateAutonomousPlan(input: GenerateEventPlanInput): Omit<EventPlan, "id" | "createdAt" | "updatedAt"> {
   const currency = input.currency || "USD";
-  const budget = Math.max(500, input.budget || 5000);
-  const guestCount = Math.max(10, input.guestCount || 50);
+  const budget = (typeof input.budget === "number" && !isNaN(input.budget) && input.budget >= 0) ? Math.round(input.budget) : 1000;
+  const guestCount = (typeof input.guestCount === "number" && !isNaN(input.guestCount) && input.guestCount >= 1) ? Math.round(input.guestCount) : 10;
   const eventType = input.eventType || "custom";
 
   // 1. Budget Allocations
@@ -123,11 +591,11 @@ export function generateAutonomousPlan(input: GenerateEventPlanInput): Omit<Even
   // 3. Day-of Run of Show
   const runOfShow: RunOfShowItem[] = getRunOfShowForType(eventType, input.title);
 
-  // 4. Vendors Needed
-  const vendors: Vendor[] = getVendorsForType(eventType, budgetAllocations);
+  // 4. Vendors Needed (tailored to location and budget)
+  const vendors: Vendor[] = getVendorsForType(eventType, budgetAllocations, input.location);
 
-  // 5. Personalized Ideas & Suggestions
-  const ideas: EventIdeas = getIdeasForType(eventType, input.stylePreferences);
+  // 5. Personalized Ideas & Suggestions (dietary preferences, speeches, themes)
+  const ideas: EventIdeas = getIdeasForType(eventType, input);
 
   // 6. Sample Initial Guests
   const sampleGuests: Guest[] = [
@@ -170,6 +638,354 @@ export function generateAutonomousPlan(input: GenerateEventPlanInput): Omit<Even
     guests: sampleGuests,
     chatHistory,
   };
+}
+
+/**
+ * Generate a FULL event plan using Gemini or OpenAI API.
+ * The AI is given the user's inputs and asked to return a structured JSON plan.
+ * Falls back to the hardcoded autonomous plan if no API key or on error.
+ */
+export async function generateAIPlan(
+  input: GenerateEventPlanInput,
+  apiKey?: string,
+  provider: "auto" | "gemini" | "openai" = "auto",
+  model?: string
+): Promise<Omit<EventPlan, "id" | "createdAt" | "updatedAt">> {
+  // If no API key, fall back to autonomous planner
+  if (!apiKey) {
+    return generateAutonomousPlan(input);
+  }
+
+  const currency = input.currency || "USD";
+  const budget = (typeof input.budget === "number" && !isNaN(input.budget) && input.budget >= 0) ? Math.round(input.budget) : 1000;
+  const guestCount = (typeof input.guestCount === "number" && !isNaN(input.guestCount) && input.guestCount >= 1) ? Math.round(input.guestCount) : 10;
+  const tier = getBudgetTier(budget, currency);
+
+  const planPrompt = `You are Planora AI, an expert event planner, financial advisor, and creative stylist.
+The user wants to plan the following event. Generate a COMPLETE, PERSONALIZED plan.
+
+EVENT DETAILS:
+- Title: ${input.title}
+- Type: ${input.eventType.replace("_", " ")}
+- Budget: ${currency} ${budget.toLocaleString()} (${tier.toUpperCase()} TIER)
+- Guest Count: ${guestCount}
+- Date: ${input.date || "TBD (approximately 1 month from now)"}
+- Location: ${input.location || "Not specified yet"}
+- Style Preferences: ${input.stylePreferences || "None specified"}
+- Special Requests: ${input.specialRequests || "None"}
+
+Generate a COMPLETE event plan as JSON with this exact structure. Make EVERY field personalized and specific to this event — do NOT use generic placeholders. Allocate the budget realistically. Create creative, unique ideas tailored to the event type and preferences.
+
+Return ONLY valid JSON (no markdown, no code fences) with this structure:
+{
+  "theme": "A creative, specific theme name for this event",
+  "budgetAllocations": [
+    { "category": "string", "allocatedAmount": number, "notes": "string" }
+  ],
+  "milestones": [
+    { "timeframe": "string like '4 Weeks Before'", "title": "string", "description": "string" }
+  ],
+  "runOfShow": [
+    { "time": "string like '06:00 PM'", "activity": "string", "personInCharge": "string", "location": "string" }
+  ],
+  "vendors": [
+    { "name": "Specific vendor/company name suggestion", "category": "string", "status": "researching", "quotedPrice": number, "notes": "string" }
+  ],
+  "ideas": {
+    "themes": [
+      { "name": "string", "description": "string", "colorPalette": ["#hex","#hex","#hex","#hex"], "vibes": "string", "decorations": ["string","string","string"] }
+    ],
+    "activities": [
+      { "title": "string", "targetGroup": "string", "description": "string", "duration": "string" }
+    ],
+    "menus": [
+      { "title": "string", "items": ["string"], "dietaryHighlights": ["string"] }
+    ],
+    "invitationTemplates": [
+      { "style": "string", "headline": "string", "body": "string", "rsvpDeadlineText": "string" }
+    ],
+    "musicPlaylists": [
+      { "vibe": "string", "recommendedGenres": ["string"], "songHighlights": ["string"] }
+    ]
+  },
+  "welcomeMessage": "A personalized welcome message for the event creator"
+}
+
+IMPORTANT RULES:
+- Budget allocations MUST sum to approximately ${budget}
+- CRITICAL FOR DECORATIONS ("decorations" list in ideas.themes):
+  Calibrate decorations strictly to the budget of ${currency} ${budget.toLocaleString()} (${tier} tier) with ${guestCount} guests.
+  You MUST include the essential, recognizable celebration supplies users expect:
+  1. Balloons: "Colorful Latex Party Balloons (Pack of 20)" or themed balloon accents
+  2. Cake: "Fresh Celebration Birthday Cake with Candles"
+  3. Banner: "Happy Birthday Letter Wall Banner & Bunting"
+  4. Party Poppers: "Celebration Party Poppers & Table Confetti"
+  5. Party Hats: "Birthday Party Hats & Cone Caps (Pack of 5)"
+  6. Fairy Lights: "Warm LED Fairy Lights for Wall Decor"
+  7. Tableware: "Cake Cutting Knife & Paper Plates Set"
+  8. Streamers: "Colorful Crepe Paper Streamers & Ribbons"
+  NEVER propose awkward or verbose DIY phrases like "DIY Crepe Paper Streamers & Ribbon Backdrop", "Hand-Lettered Birthday Banner & Party Hats", "Cozy USB Fairy String Lights & Battery Tealights", "DIY Photo Corner with Fun Cardstock Selfie Props", or "Cake Table Confetti Sprinkles". Always prioritize clean, recognizable party essentials: Balloons, Birthday Cake with Candles, Banner, Poppers, Party Hats, and Fairy Lights.
+- Generate at least 5 milestones, 6 run-of-show items, 4 vendors, 2 themes, 2 activities, 1 menu, 2 invitation templates, 2 playlists
+- Make vendor names creative and realistic (not generic)
+- All content must be personalized to "${input.title}" — NO generic content
+- If special requests mention dietary preferences (e.g., "Veg Only"), reflect that in menus and catering vendors
+- Return ONLY the JSON object, nothing else`;
+
+  try {
+    let aiResponseText: string;
+
+    if (provider === "openai" || (!provider.includes("gemini") && apiKey.startsWith("sk-"))) {
+      aiResponseText = await callOpenAIRaw(planPrompt, apiKey, model);
+    } else {
+      aiResponseText = await callGeminiRaw(planPrompt, apiKey, model);
+    }
+
+    // Parse AI-generated plan
+    const cleanedJson = aiResponseText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/gi, "")
+      .trim();
+
+    const aiPlan = JSON.parse(cleanedJson);
+
+    // Build the full event plan from AI response, with safe defaults
+    const budgetAllocations: BudgetItem[] = (aiPlan.budgetAllocations || []).map((item: any, idx: number) => ({
+      id: `b-${idx + 1}`,
+      category: item.category || `Category ${idx + 1}`,
+      allocatedAmount: Math.round(item.allocatedAmount || 0),
+      spentAmount: 0,
+      notes: item.notes || "",
+    }));
+
+    const milestones: Milestone[] = (aiPlan.milestones || []).map((item: any, idx: number) => ({
+      id: `m-${idx + 1}`,
+      timeframe: item.timeframe || `Step ${idx + 1}`,
+      title: item.title || `Milestone ${idx + 1}`,
+      description: item.description || "",
+      completed: idx === 0,
+    }));
+
+    const runOfShow: RunOfShowItem[] = (aiPlan.runOfShow || []).map((item: any, idx: number) => ({
+      id: `ros-${idx + 1}`,
+      time: item.time || `${6 + idx}:00 PM`,
+      activity: item.activity || `Activity ${idx + 1}`,
+      personInCharge: item.personInCharge || "TBD",
+      location: item.location || "Main Area",
+      status: "upcoming" as const,
+    }));
+
+    const vendors: Vendor[] = (aiPlan.vendors || []).map((item: any, idx: number) => ({
+      id: `v-${idx + 1}`,
+      name: item.name || `Vendor ${idx + 1}`,
+      category: item.category || "General",
+      status: (item.status || "researching") as Vendor["status"],
+      quotedPrice: item.quotedPrice || 0,
+      contractSigned: false,
+      depositPaid: false,
+      notes: item.notes || "",
+    }));
+
+    const fallbackIdeas = getIdeasForType(input.eventType || "custom", input);
+    const parsedThemes = (aiPlan.ideas?.themes || []).map((t: any) => ({
+      name: t.name || fallbackIdeas.themes[0]?.name || "Custom Theme",
+      description: t.description || fallbackIdeas.themes[0]?.description || "",
+      colorPalette: t.colorPalette || fallbackIdeas.themes[0]?.colorPalette || ["#FF007F", "#00F0FF", "#7B2CBF", "#FFE600"],
+      vibes: t.vibes || fallbackIdeas.themes[0]?.vibes || "Cozy & Celebratory",
+      decorations: (t.decorations && Array.isArray(t.decorations) && t.decorations.length > 0)
+        ? t.decorations
+        : getDecorationsForEvent(input.eventType || "custom", tier),
+    }));
+
+    const ideas: EventIdeas = {
+      themes: parsedThemes.length > 0 ? parsedThemes : fallbackIdeas.themes,
+      activities: (aiPlan.ideas?.activities || []).map((a: any) => ({
+        title: a.title || "Activity",
+        targetGroup: a.targetGroup || "All guests",
+        description: a.description || "",
+        duration: a.duration || "30 minutes",
+      })),
+      menus: (aiPlan.ideas?.menus || []).map((m: any) => ({
+        title: m.title || "Menu",
+        items: m.items || [],
+        dietaryHighlights: m.dietaryHighlights || [],
+      })),
+      invitationTemplates: (aiPlan.ideas?.invitationTemplates || []).map((inv: any) => ({
+        style: inv.style || "Modern",
+        headline: inv.headline || "You're Invited!",
+        body: inv.body || "",
+        rsvpDeadlineText: inv.rsvpDeadlineText || "Please RSVP 2 weeks prior.",
+      })),
+      musicPlaylists: (aiPlan.ideas?.musicPlaylists || []).map((pl: any) => ({
+        vibe: pl.vibe || "Feel-Good",
+        recommendedGenres: pl.recommendedGenres || [],
+        songHighlights: pl.songHighlights || [],
+      })),
+      speeches: (aiPlan.ideas?.speeches && aiPlan.ideas.speeches.length > 0)
+        ? aiPlan.ideas.speeches.map((s: any) => ({
+          title: s.title || "Keynote Toast",
+          role: s.role || "Host",
+          speechText: s.speechText || "",
+          deliveryTips: s.deliveryTips || "Deliver with warmth.",
+        }))
+        : getIdeasForType(input.eventType || "custom", input).speeches,
+    };
+
+    const welcomeMsg = aiPlan.welcomeMessage ||
+      `🎉 Your AI-powered plan for "${input.title}" is ready!`;
+
+    const chatHistory: ChatMessage[] = [
+      {
+        id: `c-init-${Date.now()}`,
+        role: "assistant",
+        content: `🤖✨ **AI-Generated Plan Ready!**\n\n${welcomeMsg}\n\n• **Budget**: ${currency} ${budget.toLocaleString()} (${budgetAllocations.length} smart allocations)\n• **Guests**: ${guestCount} expected\n• **Timeline**: ${milestones.length} milestones & ${runOfShow.length} day-of blocks\n• **Vendors**: ${vendors.length} personalized vendor suggestions\n• **Theme**: ${aiPlan.theme || ideas.themes[0]?.name || "Custom"}\n\nEverything has been tailored to your event. Ask me to refine any detail!`,
+        timestamp: new Date().toISOString(),
+        suggestedActions: [
+          { label: "Review Budget", action: "OPEN_BUDGET_TAB" },
+          { label: "View Timeline", action: "OPEN_TIMELINE_TAB" },
+          { label: "Explore Ideas", action: "OPEN_IDEAS_TAB" },
+        ],
+      },
+    ];
+
+    const sampleGuests: Guest[] = [
+      { id: "g-1", name: "Guest of Honor / VIP 1", rsvpStatus: "attending", plusOnes: 1, dietary: "Standard", invitationSent: true },
+      { id: "g-2", name: "Family Representative", rsvpStatus: "attending", plusOnes: 2, dietary: "Vegetarian", invitationSent: true },
+      { id: "g-3", name: "Key Organizer / Coordinator", rsvpStatus: "attending", plusOnes: 0, dietary: "Gluten-Free", invitationSent: true },
+    ];
+
+    return {
+      title: input.title,
+      eventType: input.eventType,
+      theme: aiPlan.theme || ideas.themes[0]?.name || "Personalized Celebration",
+      date: input.date || new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0],
+      location: input.location || "To Be Confirmed",
+      guestCount,
+      currency,
+      totalBudget: budget,
+      notes: input.specialRequests ? `Special notes: ${input.specialRequests}` : "AI-Generated Plan by Planora AI.",
+      budgetAllocations,
+      expenses: [],
+      milestones,
+      runOfShow,
+      vendors,
+      ideas,
+      guests: sampleGuests,
+      chatHistory,
+    };
+  } catch (err) {
+    console.warn("[Planora AI] AI plan generation failed, falling back to autonomous engine:", err);
+    return generateAutonomousPlan(input);
+  }
+}
+
+/**
+ * Automatically resolve and map Gemini model names to ensure active, working models
+ */
+export function resolveGeminiModel(modelName?: string): string {
+  if (!modelName || !modelName.trim()) {
+    return "gemini-3.8-flash";
+  }
+  const clean = modelName.trim().replace(/^models\//, "");
+  const deprecatedMap: Record<string, string> = {
+    "gemini-2.0-flash": "gemini-3.8-flash",
+    "gemini-2.0-flash-lite": "gemini-3.8-flash",
+    "gemini-2.5-flash": "gemini-3.8-flash",
+    "gemini-1.5-flash": "gemini-3.8-flash",
+    "gemini-1.5-pro": "gemini-3.1-pro-preview",
+  };
+  return deprecatedMap[clean] || clean;
+}
+
+/**
+ * Raw Gemini API call — returns plain text response with multi-model fallback and timeout
+ */
+async function callGeminiRaw(prompt: string, apiKey: string, modelName?: string): Promise<string> {
+  const primaryModel = resolveGeminiModel(modelName);
+  const modelsToTry = [primaryModel, "gemini-flash-latest", "gemini-3.8-flash"].filter((m, idx, arr) => arr.indexOf(m) === idx);
+
+  let lastError: Error | null = null;
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
+      const body = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.75,
+          maxOutputTokens: 3072,
+        },
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (!res.ok) {
+        let errorDetail = res.statusText;
+        try {
+          const errorJson = await res.json();
+          if (errorJson?.error?.message) errorDetail = errorJson.error.message;
+        } catch { }
+        throw new Error(`Gemini API error (${res.status}): ${errorDetail}`);
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) return text;
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`[Planora AI] Gemini plan attempt with ${model} failed:`, err?.message || err);
+    }
+  }
+
+  throw lastError || new Error("Failed to generate response from Gemini");
+}
+
+/**
+ * Raw OpenAI API call — returns plain text response with timeout
+ */
+async function callOpenAIRaw(prompt: string, apiKey: string, modelName?: string): Promise<string> {
+  const cleanModel = (modelName || "gpt-4o-mini").trim();
+  const isReasoningModel = cleanModel.startsWith("o1") || cleanModel.startsWith("o3");
+
+  const body: Record<string, unknown> = {
+    model: cleanModel,
+    messages: [
+      { role: "system", content: "You are an expert event planner AI. Return only valid JSON." },
+      { role: "user", content: prompt },
+    ],
+  };
+
+  if (isReasoningModel) {
+    body.max_completion_tokens = 4096;
+  } else {
+    body.temperature = 0.8;
+    body.max_tokens = 4096;
+  }
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15000),
+  });
+
+  if (!res.ok) {
+    let errorDetail = res.statusText;
+    try {
+      const errorJson = await res.json();
+      if (errorJson?.error?.message) errorDetail = errorJson.error.message;
+    } catch { }
+    throw new Error(`OpenAI API error (${res.status}): ${errorDetail}`);
+  }
+
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || "";
 }
 
 function getMilestonesForType(eventType: EventType, targetDateStr?: string): Milestone[] {
@@ -330,24 +1146,30 @@ function getRunOfShowForType(eventType: EventType, title: string): RunOfShowItem
   }));
 }
 
-function getVendorsForType(eventType: EventType, allocations: BudgetItem[]): Vendor[] {
+function getVendorsForType(eventType: EventType, allocations: BudgetItem[], location?: string): Vendor[] {
+  const locPrefix = location && location.trim() ? `${location.split(",")[0].trim()} ` : "";
+
   const vendorProfiles: Record<string, { category: string; defaultVendor: string; status: Vendor["status"] }> = {
-    "Venue & Rentals": { category: "Venue", defaultVendor: "Grand Horizon Event Center", status: "booked" },
-    "Venue Rental": { category: "Venue", defaultVendor: "Loft 42 Penthouse & Terrace", status: "booked" },
+    "Venue & Rentals": { category: "Venue", defaultVendor: `${locPrefix}Grand Horizon Event Center`.trim(), status: "booked" },
+    "Venue Rental": { category: "Venue", defaultVendor: `${locPrefix}Celebration Loft & Hall`.trim(), status: "booked" },
     "Permits, Security & City Fees": { category: "Government & Permits", defaultVendor: "City Municipal Event Desk", status: "booked" },
-    "Catering & Bar": { category: "Catering", defaultVendor: "Savor Artisan Kitchen & Bar", status: "quote_received" },
-    "Food & Finger Bites": { category: "Catering", defaultVendor: "BiteCraft Catering Co.", status: "quote_received" },
+    "Catering & Bar": { category: "Catering", defaultVendor: `${locPrefix}Savor Artisan Kitchen & Bar`.trim(), status: "quote_received" },
+    "Food & Finger Bites": { category: "Catering", defaultVendor: `${locPrefix}BiteCraft Catering Co.`.trim(), status: "quote_received" },
+    "Cake & Custom Sweets": { category: "Bakery & Desserts", defaultVendor: `${locPrefix}Artisan Sweets & Cake Studio`.trim(), status: "booked" },
+    "Drinks & Mocktails/Cocktails": { category: "Beverages & Bar", defaultVendor: `${locPrefix}PourCraft Signature Mocktail Bar`.trim(), status: "quote_received" },
     "Main Stage & Artist Headliner": { category: "Artist Agency", defaultVendor: "Apex Music Bookings", status: "shortlisted" },
-    "Photography & Videography": { category: "Photography", defaultVendor: "Aura Cinematic Photography", status: "booked" },
-    "Decor & Floral Design": { category: "Decor & Floral", defaultVendor: "Petals & Velvet Event Styling", status: "contacted" },
-    "Entertainment & Music": { category: "Music & DJ", defaultVendor: "Sonic Wave DJ & Sound Hire", status: "contacted" },
-    "Sound, Stage & Lighting (AV)": { category: "Audio/Visual", defaultVendor: "StageCraft Pro AV Rentals", status: "booked" },
+    "Photography & Videography": { category: "Photography", defaultVendor: `${locPrefix}Aura Cinematic Photography`.trim(), status: "booked" },
+    "Decor & Floral Design": { category: "Decor & Floral", defaultVendor: `${locPrefix}Petals & Velvet Event Styling`.trim(), status: "contacted" },
+    "Decor & Photobooth": { category: "Decor & Photobooth", defaultVendor: `${locPrefix}GlowUp Photo Props & Backdrop Styling`.trim(), status: "contacted" },
+    "Entertainment & Music": { category: "Music & DJ", defaultVendor: `${locPrefix}Sonic Wave DJ & Sound Hire`.trim(), status: "contacted" },
+    "Entertainment & Games": { category: "Entertainment & Games", defaultVendor: `${locPrefix}FunZone Interactive Party Hosts`.trim(), status: "contacted" },
+    "Sound, Stage & Lighting (AV)": { category: "Audio/Visual", defaultVendor: `${locPrefix}StageCraft Pro AV Rentals`.trim(), status: "booked" },
   };
 
   return allocations.slice(0, 5).map((alloc, idx) => {
     const profile = vendorProfiles[alloc.category] || {
       category: alloc.category,
-      defaultVendor: `${alloc.category} Specialist Group`,
+      defaultVendor: `${locPrefix}${alloc.category} Specialists`.trim(),
       status: "contacted" as const,
     };
     return {
@@ -364,189 +1186,168 @@ function getVendorsForType(eventType: EventType, allocations: BudgetItem[]): Ven
   });
 }
 
-function getIdeasForType(eventType: EventType, preferences?: string): EventIdeas {
+function getIdeasForType(eventType: EventType, input?: GenerateEventPlanInput | string): EventIdeas {
+  const inputObj = typeof input === "object" ? input : undefined;
+  const budget = (typeof inputObj?.budget === "number" && !isNaN(inputObj.budget) && inputObj.budget >= 0)
+    ? Math.round(inputObj.budget)
+    : 5000;
+  const currency = inputObj?.currency || "USD";
+  const tier = getBudgetTier(budget, currency);
+  const calibratedDecorations = getDecorationsForEvent(eventType, tier);
+
   const themeMap: Record<EventType, EventIdeas["themes"]> = {
     wedding: [
       {
-        name: "Opulent Rose Gold & Emerald Twilight",
-        description: "Deep forest greens, soft blush roses, warm ambient candlelight, and geometric brass arches.",
+        name: tier === "micro"
+          ? "Intimate Heartfelt Gathering"
+          : tier === "budget"
+            ? "Charming Garden & Candlelight Romance"
+            : "Opulent Rose Gold & Emerald Twilight",
+        description: tier === "micro"
+          ? "Cozy, romantic, budget-conscious celebration with handmade touches, warm fairy lights, and close friends."
+          : tier === "budget"
+            ? "Warm ambient candlelight, fairy light backdrops, and delicate floral accents tailored for close loved ones."
+            : "Deep forest greens, soft blush roses, warm ambient candlelight, and geometric brass arches.",
         colorPalette: ["#1B4332", "#B76E79", "#D4AF37", "#F8F9FA"],
-        vibes: "Timeless, luxury, romantic, enchanting",
-        decorations: [
-          "Geometric Brass Ceremony Arch with White Roses & Emerald Ivy",
-          "Draped Warm Fairy Light Canopy & Floor Uplighting",
-          "Welcome Signboard on Brass Easel with Custom Calligraphy",
-          "Chiavari Chairs with Silk Ribbons & Eucalyptus Sprigs",
-          "Tall Crystal Candelabras with Glass Votive Centerpieces",
-          "Aisle Runner Carpet with Scattered Silk Rose Petals",
-          "Custom Monogram Dance Floor Lighting Projection",
-          "Velvet Table Runners & Satin Napkin Rings"
-        ],
+        vibes: tier === "micro" ? "Intimate, warm, heartfelt, charming" : "Timeless, luxury, romantic, enchanting",
+        decorations: calibratedDecorations,
       },
       {
-        name: "Coastal Minimalist Riviera",
-        description: "Breezy ivory linens, raw sandstone, olive branch sprigs, and gentle acoustic maritime tunes.",
+        name: tier === "micro"
+          ? "Pastel Meadow Simplicity"
+          : "Coastal Minimalist Riviera",
+        description: tier === "micro"
+          ? "Soft blush, warm ivory, hand-tied ribbon accents, and charming DIY paper florals."
+          : "Breezy ivory linens, raw sandstone, olive branch sprigs, and gentle acoustic maritime tunes.",
         colorPalette: ["#023E8A", "#0077B6", "#E9D8A6", "#FFFFFF"],
-        vibes: "Effortless, chic, sun-drenched, serene",
-        decorations: [
-          "Driftwood Wedding Canopy with Linen Draping",
-          "Olive Branch & White Peony Table Runners",
-          "Woven Rattan Lanterns & Pillar Candles",
-          "Custom Wooden Welcome Board on Driftwood Stand",
-          "Seashell & Linen Favor Bags with Calligraphy Tags"
-        ],
+        vibes: tier === "micro" ? "Delicate, sweet, sunlit, cozy" : "Effortless, chic, sun-drenched, serene",
+        decorations: calibratedDecorations,
       },
     ],
     birthday: [
       {
-        name: "Electric Neon Arcade & Disco Retro",
-        description: "Vibrant ultraviolet lasers, magenta and cyan LED glow props, 80s synthesizer vibes and glitter.",
+        name: tier === "micro"
+          ? "Cozy Friends & Streamers Bash"
+          : tier === "budget"
+            ? "Lively Festive Celebration & Balloon Arch"
+            : "Electric Neon Arcade & Disco Retro",
+        description: tier === "micro"
+          ? "Vibrant, DIY-crafted party with colorful crepe streamers, warm fairy lights, Polaroid memories, and sweet celebrations."
+          : tier === "budget"
+            ? "Themed balloon garland kits, warm fairy light backdrop curtain, festive party poppers, and photo props."
+            : "Vibrant ultraviolet lasers, magenta and cyan LED glow props, 80s synthesizer vibes and glitter.",
         colorPalette: ["#FF007F", "#00F0FF", "#7B2CBF", "#FFE600"],
         vibes: "High energy, nostalgic, thrilling, photogenic",
-        decorations: [
-          "Custom LED Neon Name & Number Birthday Sign",
-          "Ultraviolet (UV) Blacklight Projectors & Haze Lighting",
-          "12-Inch Mirrored Disco Balls with Rotating Ceiling Motor",
-          "Cyberpunk Balloon Garland (Chrome Cyan, Magenta & Black)",
-          "Glow Sticks, UV Neon Face Paints & LED Foam Party Batons",
-          "Holographic Photo-Wall Backdrop with Retro Arcade Props",
-          "Cake Table Neon Runner with Floating LED Candles",
-          "Fluorescent Tableware, Cups & Confetti Cannon"
-        ],
+        decorations: calibratedDecorations,
       },
       {
-        name: "Velvet Speakeasy & Golden Glamour",
-        description: "Moody vintage jazz club aesthetics, antique gold cocktail shakers, dim Edison bulbs, and velvet couches.",
+        name: tier === "micro"
+          ? "Retro Candlelight Lounge"
+          : "Velvet Speakeasy & Golden Glamour",
+        description: tier === "micro"
+          ? "Warm ambient tealights, vinyl tunes, handmade cardstock bunting, and cozy party vibes."
+          : "Moody vintage jazz club aesthetics, antique gold cocktail shakers, dim Edison bulbs, and velvet couches.",
         colorPalette: ["#1C1917", "#D97706", "#78350F", "#FAFAF9"],
         vibes: "Sophisticated, exclusive, jazzy, cozy",
-        decorations: [
-          "Vintage Edison Bulb Filament String Fixtures",
-          "Gold Brass Cocktail Bar Signs & Menu Stands",
-          "Deep Burgundy Velvet Drapes & Antique Mirrors",
-          "Smoked Glass Tealight Holders & Art Deco Table Numbers",
-          "Gramophone & Vinyl Record Photo Corner Display"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     college_festival: [
       {
-        name: "Cyber-Nexus: Future Tech & Bass Beats",
-        description: "Holographic accents, glowing circuit patterns, heavy EDM bass drops, and robotic LED installations.",
+        name: tier === "micro"
+          ? "Campus Indie Jam & Art Lawn"
+          : "Cyber-Nexus: Future Tech & Bass Beats",
+        description: tier === "micro"
+          ? "Hand-painted directional signs, student artwork gallery, acoustic unplugged vibes, and fairy-lit lawn circles."
+          : "Holographic accents, glowing circuit patterns, heavy EDM bass drops, and robotic LED installations.",
         colorPalette: ["#00F5D4", "#7B2CBF", "#F72585", "#0F172A"],
         vibes: "Futuristic, electrifying, youthful, explosive",
-        decorations: [
-          "Truss Lighting Rig with Moving Beam Lasers",
-          "Giant LED Screen Stage Backdrop & Side Scrims",
-          "Holographic Gate Arches & Circuit Board Glow Decals",
-          "Neon Directional Neon Pointers across Campus",
-          "Festival Wristbands & Glow Batons for Crowd"
-        ],
+        decorations: calibratedDecorations,
       },
       {
         name: "Bohemian Sunset Carnival",
         description: "Dreamcatchers, acoustic lawns, indie art stalls, fairy lights across trees, and open-air jam circles.",
         colorPalette: ["#E76F51", "#F4A261", "#E9C46A", "#2A9D8F"],
         vibes: "Artistic, free-spirited, communal, melodic",
-        decorations: [
-          "Festoon Fairy Lights Strung Between Trees",
-          "Handmade Dreamcatcher & Macrame Photo Booth",
-          "Rustic Wooden Palette Seating with Tribal Cushions",
-          "Chalkboard Signposts & Burlap Festival Bunting"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     community_event: [
       {
-        name: "Harvest Harmony & Eco-Fair",
-        description: "Sustainable bamboo stalls, wildflower gardens, local acoustic folk artists, zero plastic waste.",
+        name: tier === "micro"
+          ? "Neighborhood Harmony & Eco Gathering"
+          : "Harvest Harmony & Eco-Fair",
+        description: tier === "micro"
+          ? "Community-crafted eco fair with upcycled paper bunting, chalk art, mason jar lanterns, and acoustic lawn circles."
+          : "Sustainable bamboo stalls, wildflower gardens, local acoustic folk artists, zero plastic waste.",
         colorPalette: ["#2D6A4F", "#52B788", "#D8F3DC", "#B7B7A4"],
         vibes: "Warm, inclusive, wholesome, uplifting",
-        decorations: [
-          "Weatherproof Welcome Vinyl Arch Banner & Kiosk Sign",
-          "Festoon Edison Bulb String Lighting along Pathways",
-          "Color-Coded Wayfinding Directional Signboards",
-          "Eco-Friendly Burlap Bunting, Hay Bales & Wooden Fruit Crates",
-          "Artisan Stall Canopy Tents with Branded Tablecloths",
-          "Flower Pot Table Centerpieces & Wildflower Seed Packet Favors",
-          "Amphitheater Stage Backdrop Banner & Speaker Covers",
-          "Clearly Labeled Eco-Friendly Recycling & Compost Stations"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     anniversary: [
       {
-        name: "Golden Jubilee & Starlight Memories",
-        description: "Brushed champagne gold, crystal chandeliers, archival memory photo wall, and vintage strings.",
+        name: tier === "micro"
+          ? "Starlight Memories & Golden Glow"
+          : "Golden Jubilee & Starlight Memories",
+        description: tier === "micro"
+          ? "Intimate celebration with milestone photos, glowing tealights, warm string lights, and heartfelt nostalgia."
+          : "Brushed champagne gold, crystal chandeliers, archival memory photo wall, and vintage strings.",
         colorPalette: ["#D4AF37", "#FFF8DC", "#4A0E4E", "#111827"],
         vibes: "Regal, emotional, honoring, intimate",
-        decorations: [
-          "Golden Shimmer Sequin Wall Backdrop",
-          "Curated Archival Photo Memory Timeline with Fairy Lights",
-          "Gold-Rimmed Glass Charger Plates & Satin Napkin Rings",
-          "Tall Floral Centerpieces with Champagne Roses & Baby's Breath",
-          "Illuminated Golden Monogram & Number Marquee Lights",
-          "Custom Acrylic Table Numbers on Wooden Bases"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     corporate_social: [
       {
-        name: "Metropolitan Skyline Gala",
-        description: "Clean architectural lines, sleek glass tableware, indigo uplighting, and modern lounge chillout.",
+        name: tier === "micro"
+          ? "Creative Casual Meetup & Lounge"
+          : "Metropolitan Skyline Gala",
+        description: tier === "micro"
+          ? "Clean modern paper styling, warm battery fairy lights, colorful balloon accents, and DIY photo moments."
+          : "Clean architectural lines, sleek glass tableware, indigo uplighting, and modern lounge chillout.",
         colorPalette: ["#1E3A8A", "#3B82F6", "#94A3B8", "#0F172A"],
         vibes: "Polished, prestigious, inspiring, networking-friendly",
-        decorations: [
-          "Branded Step-and-Repeat Media Wall with Carpet",
-          "Indigo & Cyan Architectural Wall Uplighting",
-          "Illuminated Acrylic High-Top Cocktail Tables",
-          "Minimalist Geometric Succulent Centerpieces",
-          "Company Milestone Wall Panels & Award Pedestals"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     baby_shower: [
       {
-        name: "Storybook Garden & Pastel Dreams",
-        description: "Whimsical floral arrangements, pastel mint and buttercup yellow bunting, and vintage children's books.",
+        name: tier === "micro"
+          ? "Storybook Garden & Pastel Wishes"
+          : "Storybook Garden & Pastel Dreams",
+        description: tier === "micro"
+          ? "Whimsical DIY pastel paper fans, cute baby clothesline bunting, warm fairy lights, and succulent accents."
+          : "Whimsical floral arrangements, pastel mint and buttercup yellow bunting, and vintage children's books.",
         colorPalette: ["#A8DADC", "#F1FAEE", "#E63946", "#FFE3E0"],
         vibes: "Gentle, heartwarming, joyful, delicate",
-        decorations: [
-          "Organic Pastel Balloon Arch & Teddy Bear Props",
-          "Personalized Wooden Name Plaque & Flower Wall",
-          "White Wooden Highchair Decorated with Greenery",
-          "Pastel Floral Table Centerpieces in Ceramic Pitchers",
-          "Keepsake Advice Tree with Ribbon Cards"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     cultural_gathering: [
       {
-        name: "Festive Heritage & Radiant Lamps",
-        description: "Marigold yellow, auspicious vermilion red, traditional brass lamps, and fragrant sandalwood.",
+        name: tier === "micro"
+          ? "Festive Heritage & Traditional Diyas"
+          : "Festive Heritage & Radiant Lamps",
+        description: tier === "micro"
+          ? "Fresh marigold flower torans, entrance floral rangoli, glowing clay diyas, and authentic festive warmth."
+          : "Marigold yellow, auspicious vermilion red, traditional brass lamps, and fragrant sandalwood.",
         colorPalette: ["#DC2626", "#F59E0B", "#FBBF24", "#7F1D1D"],
         vibes: "Sacred, jubilant, traditional, bonding",
-        decorations: [
-          "Fresh Orange & Yellow Marigold Floral Torans & Garlands",
-          "Traditional Ornate Brass Diya Lamps with Floral Floating Urli",
-          "Rangoli Art Design at Grand Entrance",
-          "Rich Brocade Silk Backdrop Drapes & Floor Cushions",
-          "Brass Bells, Mango Leaf Door Hangings & Incense Burners"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
     custom: [
       {
-        name: "Modern Contemporary Harmony",
-        description: "Balanced neutral palette with vibrant pops of color tailored to the event vision.",
+        name: tier === "micro"
+          ? "Intimate Handcrafted Celebration"
+          : "Modern Contemporary Harmony",
+        description: tier === "micro"
+          ? "Cozy, charming setting with handmade paper bunting, warm fairy lights, and colorful party touches."
+          : "Balanced neutral palette with vibrant pops of color tailored to the event vision.",
         colorPalette: ["#6366F1", "#EC4899", "#F3F4F6", "#111827"],
         vibes: "Clean, inviting, adaptable",
-        decorations: [
-          "Custom Entrance Welcome Banner & Easel",
-          "Ambient Warm String Lighting & LED Uplights",
-          "Themed Balloon Garland & Photo Backdrop",
-          "Coordinated Table Linens, Runners & Centerpieces",
-          "Directional Signage & Favor Display Table"
-        ],
+        decorations: calibratedDecorations,
       },
     ],
   };
@@ -616,10 +1417,58 @@ function getIdeasForType(eventType: EventType, preferences?: string): EventIdeas
     ],
   };
 
+  const isVeg = Boolean(inputObj?.specialRequests && /veg|vegetarian|vegan|jain/i.test(inputObj.specialRequests));
+  let finalMenus = menuMap[eventType] || menuMap.custom;
+
+  if (isVeg) {
+    finalMenus = [
+      {
+        title: "Royal Gourmet Pure Vegetarian Feast & Grazing Table",
+        items: [
+          "Royal Paneer Malai Tikka & Mint Chutney",
+          "Truffled Wild Mushroom & Baby Spinach Sliders",
+          "Crispy Golden Lotus Stem & Edamame Bites with Sweet Chilli",
+          "Loaded Truffle Herb Fries with Plant-Based Garlic Aioli",
+          "Custom Multi-Tiered Celebration Cake (100% Eggless)"
+        ],
+        dietaryHighlights: [
+          "100% Pure Vegetarian & Plant-Based Friendly (per special request)",
+          "Jain and Eggless Options Labeled Clearly"
+        ]
+      }
+    ];
+  }
+
+  const hostName = inputObj?.title?.split(/\s+(?:birthday|wedding|anniversary|party|celebration|bash)/i)[0] || "The Host";
+  const locationLabel = inputObj?.location || "this wonderful venue";
+  const guestsLabel = inputObj?.guestCount ? `${inputObj.guestCount} guests` : "all our loved ones";
+  const titleLabel = inputObj?.title || `${eventType.replace("_", " ")} celebration`;
+
+  const speeches: SpeechIdea[] = [
+    {
+      title: `Host Welcome & Opening Toast for "${titleLabel}"`,
+      role: "Host / Celebrant",
+      speechText: `Good evening everyone! Thank you so much for being here at ${locationLabel} to celebrate ${titleLabel}. Having each of our ${guestsLabel} gathered in this room means the absolute world to me. Tonight is all about great memories, wonderful conversations, and unforgettable celebrations. Let's raise our glasses to good times and cherished friends—cheers!`,
+      deliveryTips: "Deliver with a warm smile right after welcome drinks are served. Keep it around 2 minutes."
+    },
+    {
+      title: `Heartfelt Toast to ${hostName}`,
+      role: "Best Friend / VIP Guest",
+      speechText: `To ${hostName}: watching you reach this milestone is such an honor for all of us. You bring unmatched energy, kindness, and laughter everywhere you go. On behalf of everyone here at ${titleLabel}, we wish you the happiest year ahead, filled with health, big dreams, and pure joy. To ${hostName}!`,
+      deliveryTips: "Best given right before the cake cutting or keynote dinner segment. Raise your glass at the end."
+    },
+    {
+      title: `Vote of Thanks & Cake Cutting Address`,
+      role: "Celebrant / Host",
+      speechText: `Before we cut the cake and hit the dance floor, I want to say a huge heartfelt thank you to everyone who helped bring ${titleLabel} together—especially our wonderful friends, family, and organizers. Your love and presence tonight made this day truly magical. Thank you all, and let's enjoy the rest of the night!`,
+      deliveryTips: "Gather everyone around the cake table. Keep it sweet, punchy, and energetic."
+    }
+  ];
+
   return {
     themes: themeMap[eventType] || themeMap.custom,
     activities: activityMap[eventType] || activityMap.custom,
-    menus: menuMap[eventType] || menuMap.custom,
+    menus: finalMenus,
     invitationTemplates: [
       {
         style: "Contemporary & Polished",
@@ -646,6 +1495,7 @@ function getIdeasForType(eventType: EventType, preferences?: string): EventIdeas
         songHighlights: ["Beyond - Leon Bridges", "Come Away With Me - Norah Jones", "Golden - Harry Styles (Acoustic)"],
       },
     ],
+    speeches,
   };
 }
 
@@ -656,7 +1506,8 @@ export async function processAIChat(
   event: EventPlan,
   userMessage: string,
   apiKey?: string,
-  provider: "auto" | "gemini" | "openai" = "auto"
+  provider: "auto" | "gemini" | "openai" = "auto",
+  model?: string
 ): Promise<LLMResponse> {
   const normalizedMsg = userMessage.toLowerCase().trim();
 
@@ -664,9 +1515,9 @@ export async function processAIChat(
   if (apiKey) {
     try {
       if (provider === "openai" || (!provider.includes("gemini") && apiKey.startsWith("sk-"))) {
-        return await callOpenAIChat(event, userMessage, apiKey);
+        return await callOpenAIChat(event, userMessage, apiKey, model);
       } else {
-        return await callGeminiChat(event, userMessage, apiKey);
+        return await callGeminiChat(event, userMessage, apiKey, model);
       }
     } catch (err) {
       console.warn("[Planora AI] External LLM call failed, falling back to autonomous engine:", err);
@@ -674,8 +1525,13 @@ export async function processAIChat(
     }
   }
 
-  // Autonomous Intelligence Router
-  if (normalizedMsg.includes("budget") || normalizedMsg.includes("cut") || normalizedMsg.includes("save") || normalizedMsg.includes("cost") || normalizedMsg.includes("reallocate")) {
+  // ──────────────────────────────────────────────────
+  // AUTONOMOUS INTELLIGENCE ROUTER (no API key or API error fallback)
+  // Uses broad fuzzy keyword matching to handle common requests
+  // ──────────────────────────────────────────────────
+
+  // BUDGET & COST queries
+  if (/budget|cost|cut|save|reallocat|expens|spend|money|afford|cheap|pric/.test(normalizedMsg)) {
     const total = event.totalBudget;
     const spent = event.expenses.reduce((sum, exp) => sum + (exp.paid ? exp.amount : 0), 0);
     const remaining = total - spent;
@@ -689,7 +1545,33 @@ export async function processAIChat(
     };
   }
 
-  if (normalizedMsg.includes("game") || normalizedMsg.includes("icebreaker") || normalizedMsg.includes("activity") || normalizedMsg.includes("fun")) {
+  // SPEECH / TOAST queries (matches speech, speach, spech, toast, welcome address, tell me speech, write speech, etc.)
+  if (/spe+a?ch|toast|welcome.*(word|remark)|address|opening.*remark|speak|say.*few.*word|tell.*me.*spe+a?ch|give.*me.*spe+a?ch|write.*spe+a?ch|birthday.*spe+a?ch|wedding.*spe+a?ch|keynote|anchor|host.*script/i.test(normalizedMsg)) {
+    const isBirthday = event.eventType === "birthday" || /birthday/i.test(event.title);
+    const isWedding = event.eventType === "wedding" || /wedding/i.test(event.title);
+    const hostName = event.title.split(/\s+(?:birthday|wedding|anniversary|party|celebration|bash)/i)[0] || "The Host";
+
+    let speechText = "";
+    if (isBirthday) {
+      speechText = `🎤 **Personalized Birthday Toast for "${event.title}"**\n\n---\n\n*Dear friends, family, and honored guests,*\n\nThank you all for being here today at **${event.location || "this wonderful venue"}** to celebrate **${event.title}**! Having each of our ${event.guestCount} favorite people gathered in one place means more than words can express.\n\nLooking around this room, every single one of you has brought so much joy, laughter, and support to my journey. When we planned this **${event.theme}** celebration, our goal was to bring together the people who make life truly vibrant and memorable.\n\nTo another year of bolder adventures, deeper friendships, and uncontrollable laughter: please raise your glasses with me! **Happy Birthday, and cheers to all of you for making today unforgettable!** 🥂🎂\n\n*— With heartfelt love, ${hostName}*\n\n---\n\n💡 **Tips**: Personalize this speech by calling out 1 or 2 funny memories or thanking someone specifically for traveling to be here!`;
+    } else if (isWedding) {
+      speechText = `💍 **Personalized Wedding Toast for "${event.title}"**\n\n---\n\n*Distinguished family, cherished friends, and honored guests,*\n\nWelcome to **${event.location || "this beautiful celebration"}** as we honor **${event.title}**! To see all ${event.guestCount} of you surrounding us under our **${event.theme}** setting fills our hearts with immense gratitude.\n\nToday isn't just about two people coming together; it's about celebrating the love, the stories, and the friendships that brought us to this exact moment. May your glasses stay full, your feet keep dancing, and your hearts stay warm.\n\n**Here's to love that endures, friendships that never fade, and the greatest adventure of our lives!** 🥂✨\n\n*— With eternal gratitude, The Happy Couple*`;
+    } else {
+      const eventTypeLabel = event.eventType.replace(/_/g, " ");
+      speechText = `🎤 **${eventTypeLabel.charAt(0).toUpperCase() + eventTypeLabel.slice(1)} Speech for "${event.title}"**\n\n---\n\n*Dear friends, family, and honored guests,*\n\nThank you all for being here today to celebrate **${event.title}**. Your presence at **${event.location || "this wonderful venue"}** means more than words can express, and I'm so grateful to share this special moment with each of our **${event.guestCount} incredible guests**.\n\nWhen I think about what makes today truly extraordinary, it's not just the beautiful **${event.theme}** setting or the great food and music—it's *you*. Every person in this room has made this milestone unforgettable.\n\nSo please, raise your glasses with me: **Here's to laughter, to friendship, and to the beautiful adventure ahead!** 🥂\n\n*— With heartfelt gratitude, ${hostName}*`;
+    }
+
+    return {
+      content: speechText,
+      suggestedActions: [
+        { label: "View Speeches in Ideas", action: "OPEN_IDEAS_TAB" },
+        { label: "Check Timeline", action: "OPEN_TIMELINE_TAB" },
+      ],
+    };
+  }
+
+  // GAMES & ACTIVITIES queries
+  if (/game|icebreaker|activit|fun|entertain|play|quiz|trivia|danc/.test(normalizedMsg)) {
     return {
       content: `🎉 **Top 3 Curated Activities for ${event.eventType.replace("_", " ")}**:\n\n1. **The 'Guess the Year / Memory Box' Challenge**\n   Guests scan a QR code on their tables to guess which year key photos/milestones took place. Takes 15 mins and sparks instant table conversation!\n\n2. **Custom Polaroid Scavenger Hunt**\n   Leave 3 disposable or instant cameras per table with a list of 5 creative photo prompts (e.g. 'Funniest selfie with the host', 'Best dance pose', 'Group toast'). Guests pin photos to a memory board.\n\n3. **Speed Trivia Buzz**\n   A quick 10-question trivia game using our built-in trivia themes. Winning table gets the first turn at the dessert bar!`,
       suggestedActions: [
@@ -698,7 +1580,8 @@ export async function processAIChat(
     };
   }
 
-  if (normalizedMsg.includes("invite") || normalizedMsg.includes("wording") || normalizedMsg.includes("rsvp") || normalizedMsg.includes("email") || normalizedMsg.includes("speech")) {
+  // INVITATION / RSVP / EMAIL queries
+  if (/invit|wording|rsvp|email|card|announc/.test(normalizedMsg)) {
     return {
       content: `✉️ **Personalized Invitation & Announcement Copy**:\n\n**Subject**: You're Invited: Celebrating ${event.title}! 🥂\n\n*Dear [Guest Name],*\n\nWe couldn't imagine marking this special milestone without the people who mean the most to us. Please join us for an evening of joy, celebration, and cherished memories!\n\n📅 **Date**: ${event.date || "Coming Soon"}\n📍 **Location**: ${event.location || "Venue TBA"}\n✨ **Theme**: ${event.theme}\n\nKindly confirm your RSVP and let us know about any dietary preferences by clicking the link below.\n\nWith love and excitement,\n*The Hosts*`,
       suggestedActions: [
@@ -707,7 +1590,8 @@ export async function processAIChat(
     };
   }
 
-  if (normalizedMsg.includes("vendor") || normalizedMsg.includes("photographer") || normalizedMsg.includes("catering") || normalizedMsg.includes("dj")) {
+  // VENDOR queries
+  if (/vendor|photograph|cater|dj|florist|baker|decorator|supplier|book|hire/.test(normalizedMsg)) {
     const vendorCount = event.vendors.length;
     const bookedCount = event.vendors.filter((v) => v.status === "booked").length;
     return {
@@ -718,9 +1602,78 @@ export async function processAIChat(
     };
   }
 
-  // Default contextual assistant response
+  // TIMELINE / SCHEDULE queries
+  if (/timeline|schedule|when|milestone|deadline|checklist|countdown|plan.*day|run.*show/.test(normalizedMsg)) {
+    const completedMilestones = event.milestones.filter(m => m.completed).length;
+    const totalMilestones = event.milestones.length;
+    const nextMilestone = event.milestones.find(m => !m.completed);
+    return {
+      content: `📅 **Timeline Progress for ${event.title}**:\n\n• **Milestones**: ${completedMilestones}/${totalMilestones} completed\n• **Run of Show**: ${event.runOfShow.length} scheduled blocks\n${nextMilestone ? `\n⏭️ **Next Up**: *${nextMilestone.title}* (${nextMilestone.timeframe})\n${nextMilestone.description}` : "\n✅ All milestones are on track!"}\n\n**Quick Tips**:\n1. Review your run-of-show timeline to ensure smooth transitions between activities\n2. Confirm all vendor arrival times align with your schedule\n3. Build in 15-minute buffers between major segments`,
+      suggestedActions: [
+        { label: "View Timeline", action: "OPEN_TIMELINE_TAB" },
+      ],
+    };
+  }
+
+  // MUSIC / PLAYLIST queries
+  if (/music|playlist|song|dj|band|perform/.test(normalizedMsg)) {
+    const playlists = event.ideas.musicPlaylists;
+    const playlistInfo = playlists.length > 0
+      ? playlists.map(p => `🎵 **${p.vibe}**: ${p.songHighlights.slice(0, 3).join(", ")}`).join("\n")
+      : "No playlists configured yet";
+    return {
+      content: `🎶 **Music & Entertainment Guide for ${event.title}**:\n\n${playlistInfo}\n\n**DJ/Music Tips**:\n1. Start with ambient/lounge music during arrivals and dinner\n2. Transition to upbeat hits for the dance floor segment\n3. End with 2-3 nostalgic sing-along anthems before wind-down\n4. Always have a backup Bluetooth speaker in case of AV issues`,
+      suggestedActions: [
+        { label: "Explore Ideas", action: "OPEN_IDEAS_TAB" },
+      ],
+    };
+  }
+
+  // MENU / FOOD / CATERING queries
+  if (/menu|food|cater|dinner|lunch|breakfast|snack|diet|veg|meal|drink|cocktail|bar/.test(normalizedMsg)) {
+    const menus = event.ideas.menus;
+    const menuInfo = menus.length > 0
+      ? menus.map(m => `🍽️ **${m.title}**:\n${m.items.map(i => `   • ${i}`).join("\n")}\n   Dietary: ${m.dietaryHighlights.join(", ") || "Standard"}`).join("\n\n")
+      : "No menus configured yet — let me suggest some!";
+    return {
+      content: `🍽️ **Menu & Catering Guide for ${event.title}**:\n\n${menuInfo}\n\n**Catering Tips for ${event.guestCount} guests**:\n• Plan for 6-8 appetizer pieces per person for cocktail hour\n• Order 10% extra meals to account for plus-ones and vendor meals\n• Confirm dietary restrictions at least 1 week before the event`,
+      suggestedActions: [
+        { label: "View Budget", action: "OPEN_BUDGET_TAB" },
+        { label: "Explore Ideas", action: "OPEN_IDEAS_TAB" },
+      ],
+    };
+  }
+
+  // GUEST / RSVP tracking queries
+  if (/guest|attend|rsvp.*track|who.*com|headcount|seat/.test(normalizedMsg)) {
+    const attending = event.guests.filter(g => g.rsvpStatus === "attending").length;
+    const pending = event.guests.filter(g => g.rsvpStatus === "pending").length;
+    const declined = event.guests.filter(g => g.rsvpStatus === "declined").length;
+    return {
+      content: `👥 **Guest Status Report for ${event.title}**:\n\n• ✅ **Attending**: ${attending}\n• ⏳ **Pending RSVP**: ${pending}\n• ❌ **Declined**: ${declined}\n• **Total Invited**: ${event.guests.length} (target: ${event.guestCount})\n\n**Action Items**:\n1. Follow up with pending RSVPs — send a friendly reminder\n2. Confirm dietary preferences for confirmed guests\n3. Update seating arrangements as confirmations come in`,
+      suggestedActions: [
+        { label: "View Guest List", action: "OPEN_GUESTS_TAB" },
+      ],
+    };
+  }
+
+  // DECOR / THEME queries
+  if (/decor|theme|color|style|design|flower|balloon|light|backdrop/.test(normalizedMsg)) {
+    const themes = event.ideas.themes;
+    const themeInfo = themes.length > 0
+      ? themes.map(t => `✨ **${t.name}**: ${t.description}\n   Colors: ${t.colorPalette.join(", ")}\n   Vibes: ${t.vibes}`).join("\n\n")
+      : `Current theme: **${event.theme}**`;
+    return {
+      content: `🎨 **Decor & Theme Ideas for ${event.title}**:\n\n${themeInfo}\n\n**Decor Tips**:\n1. Choose a max of 3 dominant colors for visual cohesion\n2. Layer lighting: string lights + candles + spotlights for depth\n3. Create an Instagram-worthy photo corner with props matching your theme\n4. Use tablescaping to tie the color palette together across the venue`,
+      suggestedActions: [
+        { label: "Explore Ideas", action: "OPEN_IDEAS_TAB" },
+      ],
+    };
+  }
+
+  // Default contextual assistant response (catch-all)
   return {
-    content: `I'm here to help you optimize every aspect of **${event.title}**! You can ask me to:\n\n• **Reallocate budgets** or calculate realistic per-guest costs\n• **Generate speech outlines**, welcome toasts, or invitation text\n• **Brainstorm unique icebreaker games** or decor themes\n• **Draft vendor emails** or timeline checklists\n• **Suggest music playlists** and day-of run of show adjustments\n\nWhat would you like to work on next?`,
+    content: `I'm here to help you plan every detail of **${event.title}**! Here's what I can help with:\n\n• 💰 **Budget**: "How can I optimize my ${event.currency} ${event.totalBudget.toLocaleString()} budget?"\n• 🎤 **Speeches**: "Write a birthday speech" or "Draft a welcome toast"\n• 🎉 **Activities**: "Suggest fun games for ${event.guestCount} guests"\n• ✉️ **Invitations**: "Write an invitation email"\n• 📋 **Vendors**: "Review my vendor bookings"\n• 📅 **Timeline**: "Show my event schedule"\n• 🍽️ **Menu**: "Suggest a vegetarian menu"\n• 🎶 **Music**: "Create a party playlist"\n• 🎨 **Decor**: "Suggest decor ideas for ${event.theme}"\n\nJust type your question and I'll provide personalized advice!`,
     suggestedActions: [
       { label: "Review Budget", action: "OPEN_BUDGET_TAB" },
       { label: "Check Timeline", action: "OPEN_TIMELINE_TAB" },
@@ -729,71 +1682,150 @@ export async function processAIChat(
   };
 }
 
-async function callGeminiChat(event: EventPlan, userMessage: string, apiKey: string): Promise<LLMResponse> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-  const systemPrompt = `You are Planora AI, an expert event planner, financial advisor, and creative stylist.
-Current Event Context:
-- Title: ${event.title} (${event.eventType})
-- Total Budget: ${event.currency} ${event.totalBudget}
-- Guest Count: ${event.guestCount}
-- Date: ${event.date}
-- Location: ${event.location}
-- Theme: ${event.theme}
-- Current Vendors: ${event.vendors.map((v) => `${v.name} (${v.category}: ${v.status})`).join(", ")}
-Provide concise, highly actionable, friendly advice with clear bullet points.`;
+/**
+ * Build a rich system prompt for AI chat, giving full event context
+ */
+function buildChatSystemPrompt(event: EventPlan): string {
+  const spent = event.expenses.reduce((sum, exp) => sum + (exp.paid ? exp.amount : 0), 0);
+  const remaining = event.totalBudget - spent;
+  const attending = event.guests.filter(g => g.rsvpStatus === "attending").length;
+  const pending = event.guests.filter(g => g.rsvpStatus === "pending").length;
+  const completedMilestones = event.milestones.filter(m => m.completed).length;
 
-  const body = {
-    contents: [
-      {
-        parts: [
-          { text: systemPrompt },
-          { text: userMessage },
-        ],
-      },
-    ],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 800,
-    },
-  };
+  return `You are Planora AI — an expert event planner, creative stylist, speech writer, budget advisor, and entertainment consultant. You help users plan AMAZING events.
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+FULL EVENT CONTEXT:
+━━━━━━━━━━━━━━━━━━
+• Title: ${event.title}
+• Type: ${event.eventType.replace(/_/g, " ")}
+• Theme: ${event.theme}
+• Date: ${event.date || "TBD"}
+• Location: ${event.location || "TBD"}
+• Guest Count: ${event.guestCount} (${attending} confirmed, ${pending} pending)
+• Budget: ${event.currency} ${event.totalBudget.toLocaleString()} (Spent: ${event.currency} ${spent.toLocaleString()}, Remaining: ${event.currency} ${remaining.toLocaleString()})
 
-  if (!res.ok) {
-    throw new Error(`Gemini API error: ${res.statusText}`);
-  }
+BUDGET BREAKDOWN:
+${event.budgetAllocations.map(b => `  • ${b.category}: ${event.currency} ${b.allocatedAmount.toLocaleString()} (spent: ${event.currency} ${b.spentAmount.toLocaleString()})`).join("\n")}
 
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "I was unable to generate a response from Gemini.";
+MILESTONES: ${completedMilestones}/${event.milestones.length} completed
+${event.milestones.slice(0, 5).map(m => `  ${m.completed ? "✅" : "⬜"} ${m.timeframe}: ${m.title}`).join("\n")}
 
-  return {
-    content: text,
-    suggestedActions: [
-      { label: "Apply to Budget", action: "OPEN_BUDGET_TAB" },
-      { label: "Check Timeline", action: "OPEN_TIMELINE_TAB" },
-    ],
-  };
+VENDORS:
+${event.vendors.length > 0 ? event.vendors.map(v => `  • ${v.name} (${v.category}) — Status: ${v.status}${v.quotedPrice ? `, Quoted: ${event.currency} ${v.quotedPrice}` : ""}`).join("\n") : "  No vendors added yet."}
+
+SPECIAL NOTES: ${event.notes || "None"}
+
+YOUR CAPABILITIES — you MUST handle ALL of these:
+1. **Speeches & Toasts**: Write complete, heartfelt speeches, welcome addresses, toasts, thank-you notes
+2. **Budget Optimization**: Analyze spending, suggest cuts, reallocate budgets, calculate per-guest costs
+3. **Activity & Games**: Suggest icebreakers, party games, entertainment ideas tailored to the event
+4. **Invitations**: Draft invitation text, RSVP reminders, email templates
+5. **Vendor Advice**: Negotiate tips, comparison advice, contract guidance
+6. **Menu Planning**: Suggest menus, dietary accommodations, catering strategies
+7. **Music & Playlists**: Curate playlist suggestions, DJ instructions, ceremony music
+8. **Decor & Themes**: Color palettes, decoration ideas, photo booth concepts
+9. **Timeline Management**: Schedule optimization, day-of logistics, contingency planning
+10. **Guest Management**: Seating arrangements, RSVP follow-ups, dietary tracking
+
+RESPONSE RULES:
+- Be warm, enthusiastic, and professional
+- Use markdown formatting with headers, bullet points, and bold text
+- Provide SPECIFIC, ACTIONABLE advice — never generic
+- Personalize everything to "${event.title}" and the event details above
+- When asked for speeches/toasts, write the COMPLETE speech text (not just tips)
+- Use emojis sparingly for visual appeal
+- Keep responses focused and under 500 words unless writing a speech`;
 }
 
-async function callOpenAIChat(event: EventPlan, userMessage: string, apiKey: string): Promise<LLMResponse> {
-  const url = "https://api.openai.com/v1/chat/completions";
-  const systemPrompt = `You are Planora AI, an elite event planner and budget strategist.
-Event context: Title=${event.title}, Type=${event.eventType}, Budget=${event.currency} ${event.totalBudget}, Guests=${event.guestCount}, Location=${event.location}.
-Provide clear, inspiring, practical event planning advice.`;
+async function callGeminiChat(
+  event: EventPlan,
+  userMessage: string,
+  apiKey: string,
+  modelName?: string
+): Promise<LLMResponse> {
+  const primaryModel = resolveGeminiModel(modelName);
+  const modelsToTry = [primaryModel, "gemini-flash-latest", "gemini-3.8-flash"].filter((m, idx, arr) => arr.indexOf(m) === idx);
+  const systemPrompt = buildChatSystemPrompt(event);
 
-  const body = {
-    model: "gpt-4o-mini",
+  let lastError: Error | null = null;
+  for (const model of modelsToTry) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${apiKey}`;
+      const body = {
+        contents: [
+          {
+            parts: [
+              { text: systemPrompt },
+              { text: userMessage },
+            ],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.75,
+          maxOutputTokens: 2048,
+        },
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(15000),
+      });
+
+      if (!res.ok) {
+        let errorDetail = res.statusText;
+        try {
+          const errorJson = await res.json();
+          if (errorJson?.error?.message) {
+            errorDetail = errorJson.error.message;
+          }
+        } catch { }
+        throw new Error(`Gemini API error (${res.status}): ${errorDetail}`);
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return {
+          content: text,
+          suggestedActions: inferSuggestedActions(userMessage),
+        };
+      }
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`[Planora AI] Gemini chat attempt with ${model} failed:`, err?.message || err);
+    }
+  }
+
+  throw lastError || new Error("Failed to generate chat response from Gemini");
+}
+
+async function callOpenAIChat(
+  event: EventPlan,
+  userMessage: string,
+  apiKey: string,
+  modelName?: string
+): Promise<LLMResponse> {
+  const cleanModel = (modelName || "gpt-4o-mini").trim();
+  const url = "https://api.openai.com/v1/chat/completions";
+  const systemPrompt = buildChatSystemPrompt(event);
+
+  const isReasoningModel = cleanModel.startsWith("o1") || cleanModel.startsWith("o3");
+  const body: Record<string, unknown> = {
+    model: cleanModel,
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userMessage },
     ],
-    temperature: 0.7,
-    max_tokens: 800,
   };
+
+  if (isReasoningModel) {
+    body.max_completion_tokens = 2048;
+  } else {
+    body.temperature = 0.75;
+    body.max_tokens = 2048;
+  }
 
   const res = await fetch(url, {
     method: "POST",
@@ -802,10 +1834,18 @@ Provide clear, inspiring, practical event planning advice.`;
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(15000),
   });
 
   if (!res.ok) {
-    throw new Error(`OpenAI API error: ${res.statusText}`);
+    let errorDetail = res.statusText;
+    try {
+      const errorJson = await res.json();
+      if (errorJson?.error?.message) {
+        errorDetail = errorJson.error.message;
+      }
+    } catch { }
+    throw new Error(`OpenAI API error (${res.status}): ${errorDetail}`);
   }
 
   const data = await res.json();
@@ -813,9 +1853,40 @@ Provide clear, inspiring, practical event planning advice.`;
 
   return {
     content: text,
-    suggestedActions: [
-      { label: "Review Timeline", action: "OPEN_TIMELINE_TAB" },
-      { label: "Vendor List", action: "OPEN_VENDORS_TAB" },
-    ],
+    suggestedActions: inferSuggestedActions(userMessage),
   };
 }
+
+/**
+ * Infer contextual suggested actions from the user's message
+ */
+function inferSuggestedActions(userMessage: string): LLMResponse["suggestedActions"] {
+  const msg = userMessage.toLowerCase();
+  if (/budget|cost|expens|money/.test(msg)) {
+    return [
+      { label: "View Budget", action: "OPEN_BUDGET_TAB" },
+      { label: "Add Expense", action: "OPEN_ADD_EXPENSE_MODAL" },
+    ];
+  }
+  if (/speech|toast|speach/.test(msg)) {
+    return [
+      { label: "View Guest List", action: "OPEN_GUESTS_TAB" },
+      { label: "Check Timeline", action: "OPEN_TIMELINE_TAB" },
+    ];
+  }
+  if (/vendor|book|hire/.test(msg)) {
+    return [{ label: "Manage Vendors", action: "OPEN_VENDORS_TAB" }];
+  }
+  if (/timeline|schedule|milestone/.test(msg)) {
+    return [{ label: "View Timeline", action: "OPEN_TIMELINE_TAB" }];
+  }
+  if (/guest|rsvp|attend/.test(msg)) {
+    return [{ label: "View Guests", action: "OPEN_GUESTS_TAB" }];
+  }
+  return [
+    { label: "Review Budget", action: "OPEN_BUDGET_TAB" },
+    { label: "Check Timeline", action: "OPEN_TIMELINE_TAB" },
+    { label: "Explore Ideas", action: "OPEN_IDEAS_TAB" },
+  ];
+}
+

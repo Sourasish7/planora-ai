@@ -107,12 +107,20 @@ export interface MusicPlaylistIdea {
   songHighlights: string[];
 }
 
+export interface SpeechIdea {
+  title: string;
+  role: string; // e.g. "Host Welcome Toast", "Best Friend / Keynote", "Heartfelt Thank You"
+  speechText: string;
+  deliveryTips: string;
+}
+
 export interface EventIdeas {
   themes: ThemeIdea[];
   activities: ActivityIdea[];
   menus: MenuIdea[];
   invitationTemplates: InvitationTemplate[];
   musicPlaylists: MusicPlaylistIdea[];
+  speeches?: SpeechIdea[];
 }
 
 export type RSVPStatus = "attending" | "declined" | "pending";
@@ -170,6 +178,7 @@ export interface PlanoraDatabase {
     preferredCurrency: string;
     apiKey?: string;
     aiProvider: "auto" | "gemini" | "openai";
+    aiModel?: string;
     theme: "dark" | "light" | "system";
   };
   auditLogs: {

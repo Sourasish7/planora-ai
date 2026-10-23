@@ -7,6 +7,7 @@ import {
   Utensils,
   Mail,
   Music,
+  Mic,
   Copy,
   Check,
 } from "lucide-react";
@@ -46,11 +47,11 @@ const getThemePicture = (themeName: string, eventType: string, idx: number) => {
 
 export const IdeasTab: React.FC<IdeasTabProps> = ({ event }) => {
   const [activeIdeaCategory, setActiveIdeaCategory] = useState<
-    "themes" | "activities" | "menus" | "invitations" | "music"
+    "themes" | "activities" | "menus" | "invitations" | "speeches" | "music"
   >("themes");
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [copiedIndex, setCopiedIndex] = useState<number | string | null>(null);
 
-  const handleCopy = (text: string, idx: number) => {
+  const handleCopy = (text: string, idx: number | string) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(idx);
     setTimeout(() => setCopiedIndex(null), 2000);
@@ -66,6 +67,7 @@ export const IdeasTab: React.FC<IdeasTabProps> = ({ event }) => {
           { id: "themes", label: "Aesthetic Themes", icon: Palette },
           { id: "activities", label: "Games & Icebreakers", icon: Gamepad2 },
           { id: "menus", label: "Menu Concepts", icon: Utensils },
+          { id: "speeches", label: "Speeches & Toasts", icon: Mic },
           { id: "invitations", label: "Invitations & Wording", icon: Mail },
           { id: "music", label: "Curated Playlists", icon: Music },
         ].map((cat) => {
@@ -280,7 +282,7 @@ export const IdeasTab: React.FC<IdeasTabProps> = ({ event }) => {
         <div className="space-y-6">
           <div className="rounded-2xl border-2 border-black bg-white p-6 shadow-[4px_4px_0px_0px_#000]">
             <h4 className="text-lg font-black text-black">
-              Personalized Invitation Suites & Speeches
+              Personalized Invitation Suites & Announcements
             </h4>
             <p className="mt-1 text-xs font-medium text-slate-700">
               One-click copyable announcement templates ready to email, text, or print.
@@ -337,6 +339,89 @@ export const IdeasTab: React.FC<IdeasTabProps> = ({ event }) => {
           </div>
         </div>
       )}
+
+      {/* 5. Speeches & Toasts */}
+      {activeIdeaCategory === "speeches" && (() => {
+        const defaultSpeeches = [
+          {
+            title: `Host Welcome & Opening Toast for ${event.title}`,
+            role: "Host / Celebrant",
+            speechText: `Good evening everyone! Thank you so much for being here at ${event.location || "this wonderful venue"} to celebrate ${event.title}. Having each of our ${event.guestCount} favorite people in this room means the absolute world to me. Tonight is all about great memories, wonderful conversations, and unforgettable celebrations. Let's raise our glasses to good times and cherished friends—cheers!`,
+            deliveryTips: "Deliver with a warm smile right after welcome drinks are served. Keep it around 2 minutes."
+          },
+          {
+            title: `Heartfelt Toast to the Guest of Honor`,
+            role: "Best Friend / VIP Guest",
+            speechText: `To our guest of honor: watching you reach this milestone is such an honor for all of us. You bring unmatched energy, kindness, and laughter everywhere you go. On behalf of everyone here at ${event.title}, we wish you the happiest year ahead, filled with health, big dreams, and pure joy. Cheers!`,
+            deliveryTips: "Best given right before the cake cutting or keynote dinner segment. Raise your glass at the end."
+          },
+          {
+            title: `Vote of Thanks & Cake Cutting Address`,
+            role: "Celebrant / Host",
+            speechText: `Before we cut the cake and hit the dance floor, I want to say a huge heartfelt thank you to everyone who helped bring ${event.title} together—especially our wonderful friends, family, and organizers. Your love and presence tonight made this day truly magical. Thank you all, and let's enjoy the rest of the night!`,
+            deliveryTips: "Gather everyone around the cake table. Keep it sweet, punchy, and energetic."
+          }
+        ];
+        const speechList = (ideas.speeches && ideas.speeches.length > 0) ? ideas.speeches : defaultSpeeches;
+
+        return (
+          <div className="space-y-6">
+            <div className="rounded-2xl border-2 border-black bg-white p-6 shadow-[4px_4px_0px_0px_#000]">
+              <h4 className="text-lg font-black text-black">
+                Personalized Speeches & Keynote Toasts
+              </h4>
+              <p className="mt-1 text-xs font-medium text-slate-700">
+                Ready-to-deliver speech scripts calibrated for your {event.eventType.replace("_", " ")} celebrating "{event.title}".
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {speechList.map((speech, idx) => (
+                <div
+                  key={idx}
+                  className="rounded-2xl border-2 border-black bg-white p-6 flex flex-col justify-between space-y-4 shadow-[4px_4px_0px_0px_#000]"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-full border-1.5 border-black bg-[#eefc27] px-3 py-1 text-[11px] font-black text-black shadow-[1px_1px_0px_0px_#000]">
+                        {speech.role}
+                      </span>
+                      <button
+                        onClick={() => handleCopy(speech.speechText, `speech-${idx}`)}
+                        className="neo-btn flex items-center gap-1.5 px-3 py-1.5 text-xs font-black shadow-[2px_2px_0px_0px_#000]"
+                      >
+                        {copiedIndex === `speech-${idx}` ? (
+                          <>
+                            <Check className="h-3.5 w-3.5 text-emerald-600" />
+                            <span className="text-emerald-700">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3.5 w-3.5" />
+                            <span>Copy Speech</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    <h5 className="text-base font-black text-black">
+                      {speech.title}
+                    </h5>
+
+                    <p className="text-xs font-medium text-slate-900 leading-relaxed whitespace-pre-line bg-[#faf8f2] rounded-xl p-4 border-2 border-black font-serif italic shadow-[2px_2px_0px_0px_#000]">
+                      "{speech.speechText}"
+                    </p>
+
+                    <div className="text-[11px] text-slate-800 font-bold bg-[#f1f5f9] rounded-lg p-2.5 border border-black">
+                      🎤 <span className="font-black">Delivery Tips:</span> {speech.deliveryTips}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 5. Playlists & Music */}
       {activeIdeaCategory === "music" && (

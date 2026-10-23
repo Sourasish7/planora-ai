@@ -39,9 +39,11 @@ export default function Home() {
   const [settings, setSettings] = useState<{
     apiKey?: string;
     aiProvider: "auto" | "gemini" | "openai";
+    aiModel?: string;
     preferredCurrency: string;
   }>({
     aiProvider: "auto",
+    aiModel: "",
     preferredCurrency: "USD",
   });
 
@@ -316,7 +318,12 @@ export default function Home() {
       const res = await fetch(`/api/events/${currentEvent.id}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({
+          message,
+          apiKey: settings.apiKey,
+          provider: settings.aiProvider,
+          model: settings.aiModel,
+        }),
       });
       const data = await res.json();
       if (data.success) {
@@ -333,6 +340,7 @@ export default function Home() {
   const handleSaveSettings = async (newSettings: {
     apiKey?: string;
     aiProvider: "auto" | "gemini" | "openai";
+    aiModel?: string;
     preferredCurrency: string;
   }) => {
     try {
@@ -494,17 +502,12 @@ export default function Home() {
               </div>
 
               {/* Hand-drawn celebration crowd illustration */}
-              <div className="relative rounded-3xl border-2 border-black bg-white p-6 shadow-[6px_6px_0px_0px_#000] overflow-hidden flex items-center justify-center min-h-[280px]">
+              <div className="flex items-center justify-center p-2">
                 <img
-                  src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=800&q=80"
-                  alt="Celebration crowd"
-                  className="w-full h-64 object-cover rounded-2xl border-2 border-black filter grayscale contrast-125"
+                  src="https://i.ibb.co/LDjFdZs7/image-removebg-preview.png"
+                  alt="Planora AI Illustration"
+                  className="w-full max-h-[360px] object-contain transition-transform hover:scale-105 duration-300"
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="rounded-full border-2 border-black bg-[#eefc27] px-3 py-1 text-xs font-black text-black shadow-[2px_2px_0px_0px_#000]">
-                    Planora Engine Active
-                  </span>
-                </div>
               </div>
             </div>
 
@@ -572,8 +575,14 @@ export default function Home() {
                   const form = e.currentTarget;
                   const title = (form.elements.namedItem("title") as HTMLInputElement).value;
                   const eventType = (form.elements.namedItem("eventType") as HTMLSelectElement).value;
-                  const budget = parseFloat((form.elements.namedItem("budget") as HTMLInputElement).value) || 10000;
-                  const guestCount = parseInt((form.elements.namedItem("guestCount") as HTMLInputElement).value, 10) || 50;
+                  const budgetRaw = (form.elements.namedItem("budget") as HTMLInputElement).value;
+                  const parsedBudget = parseFloat(budgetRaw);
+                  const budget = !isNaN(parsedBudget) ? Math.max(0, parsedBudget) : 1000;
+
+                  const guestRaw = (form.elements.namedItem("guestCount") as HTMLInputElement).value;
+                  const parsedGuests = parseInt(guestRaw, 10);
+                  const guestCount = !isNaN(parsedGuests) && parsedGuests > 0 ? Math.max(1, parsedGuests) : 10;
+
                   const date = (form.elements.namedItem("date") as HTMLInputElement).value;
                   const location = (form.elements.namedItem("location") as HTMLInputElement).value;
                   handleCreateEvent({
@@ -631,7 +640,7 @@ export default function Home() {
                     <input
                       name="budget"
                       type="number"
-                      min="100"
+                      min="1"
                       defaultValue={15000}
                       className="mt-1 w-full rounded-xl border-2 border-black bg-[#faf8f2] p-2.5 text-black font-bold focus:outline-none shadow-[1.5px_1.5px_0px_0px_#000]"
                     />
@@ -642,7 +651,7 @@ export default function Home() {
                     <input
                       name="guestCount"
                       type="number"
-                      min="5"
+                      min="1"
                       defaultValue={80}
                       className="mt-1 w-full rounded-xl border-2 border-black bg-[#faf8f2] p-2.5 text-black font-bold focus:outline-none shadow-[1.5px_1.5px_0px_0px_#000]"
                     />
@@ -714,6 +723,7 @@ export default function Home() {
         onClose={() => setIsSettingsModalOpen(false)}
         apiKey={settings.apiKey}
         aiProvider={settings.aiProvider}
+        aiModel={settings.aiModel}
         preferredCurrency={settings.preferredCurrency}
         onSaveSettings={handleSaveSettings}
       />
